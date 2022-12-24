@@ -1,0 +1,37 @@
+[remap]
+
+importer="LDtk_world.import"
+type="PackedScene"
+uid="uid://dt84d3ry1k62"
+path="res://.godot/imported/test-api.ldtk-0d5e0e641310acdf0668fb90ad94707e.scn"
+
+[deps]
+
+files=["res://test-map/test-api/tilesets/2.res"]
+
+source_file="res://test-map/test-api.ldtk"
+dest_files=["res://.godot/imported/test-api.ldtk-0d5e0e641310acdf0668fb90ad94707e.scn", "res://test-map/test-api/tilesets/2.res"]
+
+[params]
+
+post_import_script=""
+Collisions=""
+Import_Collisions=false
+Collision_Layer=2
+Levels=""
+post_import_level_script=""
+Import_All_Levels=true
+Levels_To_import="0,1"
+pack_levels=false
+Create_Level_Areas=false
+Level_Area_Padding=Vector2(0, 0)
+Level_Area_Opacity=0.5
+Level_Area_Collision_Layer=64
+Minimaps=""
+Generate_Minimaps=true
+Clean_Minimaps=false
+Ignore_Data_Layers=""
+Ignore_Data_Values=""
+Entities=""
+Import_Custom_Entities=true
+Import_Metadata=true
