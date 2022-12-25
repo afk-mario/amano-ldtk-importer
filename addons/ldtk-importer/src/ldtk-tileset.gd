@@ -13,7 +13,7 @@ static func get_tilesets_dict(tilesets_data: Array, base_dir: String, options: D
 	var dict := {}
 
 	for data in tilesets_data:
-		var tileset = create_tileset(base_dir, data, options.Import_Collisions)
+		var tileset = create_tileset(base_dir, data, options)
 		if tileset:
 			dict[int(data.uid)] = tileset
 
@@ -37,10 +37,11 @@ static func create_tileset_resources(source_file: String, tilesets_dict: Diction
 	return gen_files
 
 
-static func create_tileset(base_dir: String, tileset_data: Dictionary, import_collisions: bool) -> TileSet:
+static func create_tileset(base_dir: String, tileset_data: Dictionary, options: Dictionary) -> TileSet:
 	if tileset_data.relPath == null:
 		return null
 
+	var import_collisions :bool = options.Import_Collisions
 	var tileset := TileSet.new()
 	tileset.resource_name = tileset_data.identifier
 	
@@ -49,52 +50,68 @@ static func create_tileset(base_dir: String, tileset_data: Dictionary, import_co
 	var texture_image :Image = texture.get_image()
 	
 	var collision_tiles_ids := get_tiles_ids_by_tag(tileset_data, "Collision")
-
 	var tileset_source := TileSetAtlasSource.new()
 	tileset_source.texture = texture
 
-	var gridWidth :int = (
+	var grid_with :int = (
 		(tileset_data.pxWid - tileset_data.padding)
 		/ (tileset_data.tileGridSize + tileset_data.spacing)
 	)
-	var gridHeight :int = (
+	var grid_height :int = (
 		(tileset_data.pxHei - tileset_data.padding)
 		/ (tileset_data.tileGridSize + tileset_data.spacing)
 	)
 
-	var gridSize := gridWidth * gridHeight
+	var gridSize := grid_with * grid_height
 	var shape_id := 0
 	var tile_size := Vector2i(tileset_data.tileGridSize, tileset_data.tileGridSize)
+	var tile_extents := Vector2(tile_size.x/2, tile_size.y/2)
 	tileset.tile_size = tile_size
 	tileset_source.texture_region_size = tile_size
+	var layer_id := 0
+	var tileset_source_id := tileset.add_source(tileset_source)
+	
+	# TODO: Instead of triying to guess the best way create collisions for the user
+	# import all the custom data from LDtk including the enum tags and let a 
+	# plugin modify the results as they want, for example creating a square
+	# collision shape per tile with a certain tag like here.
+	if import_collisions:
+		tileset.add_physics_layer()
+		tileset.set_physics_layer_collision_layer(layer_id, options.Collision_Layer)
+		tileset.set_physics_layer_collision_mask(layer_id, 0)
 
-	var base_collision_shape := RectangleShape2D.new()
-	base_collision_shape.set_size(tile_size)
-
-	for y in range(0, gridHeight):
-		for x in range(0, gridWidth):
-			var atlas_coords := Vector2i(x,y)
-			var tile_region := Tile.get_tile_region(atlas_coords, tileset_data)
+	for y in range(0, grid_height):
+		for x in range(0, grid_with):
+			var grid_coords := Vector2i(x,y)
+			var tile_region := Tile.get_tile_region(grid_coords, tileset_data)
 			var tile_image := texture_image.get_region(tile_region)
 
 			if not tile_image.is_invisible():
-				tileset_source.create_tile(atlas_coords)
+				tileset_source.create_tile(grid_coords)
 
-				var has_collision = collision_tiles_ids.has(atlas_coords)
+				if import_collisions:
+					var tile_id := Tile.tile_grid_coords_to_tile_id(grid_coords, grid_with)
+					var has_collision = collision_tiles_ids.has(tile_id)
 
-				var col_shape = null
-				var col_offset = tile_size / 2
-				var is_one_way = false
+					if has_collision:
+						var alternative_tile := 0
+						var tile_data :TileData = tileset_source.get_tile_data(grid_coords, alternative_tile)
+						tile_data.add_collision_polygon(layer_id)
+						tile_data.set_collision_polygon_points(
+							layer_id, 
+							0, 
+							PackedVector2Array(
+								[
+									Vector2(-tile_extents.x, -tile_extents.y), 
+									Vector2(-tile_extents.x, tile_extents.y), 
+									Vector2(tile_extents.x, tile_extents.y),  
+									Vector2(tile_extents.x, -tile_extents.y)
+								]
+							)
+						)
 
-				if has_collision:
-					col_shape = base_collision_shape
-					tileset.tile_set_shape(atlas_coords, shape_id, col_shape)
-					tileset.tile_set_shape_offset(atlas_coords, shape_id, col_offset)
-					tileset.tile_set_shape_one_way(atlas_coords, shape_id, is_one_way)
+					shape_id += 1
 
-				shape_id += 1
-
-	tileset.add_source(tileset_source)
 	return tileset
 
 
@@ -110,7 +127,7 @@ static func get_tiles_ids_by_tag(data: Dictionary, tag_id: String) -> Array:
 			solidEnum = tag
 
 	if solidEnum:
-		return solidEnum.tileIds
+		return solidEnum.tileIds.map(func(id): return int(id))
 
 	return []
 

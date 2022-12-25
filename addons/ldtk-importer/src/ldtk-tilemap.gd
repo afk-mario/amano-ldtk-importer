@@ -14,10 +14,11 @@ static func create_tilemap(
 ) -> TileMap:
 	var import_collisions :bool = options.Import_Collisions
 	var tilemap := TileMap.new()
-	var tileset_uid := int(tilemap_data.__tilesetDefUid)
-	if not tileset_uid:
-		return null
 
+	if not tilemap_data.__tilesetDefUid:
+		return null
+		
+	var tileset_uid = int(tilemap_data.__tilesetDefUid)
 	var tile_set
 	var tileset_path := (
 		Tileset.get_tileset_save_path(source_file, is_external_level)
@@ -48,11 +49,6 @@ static func create_tilemap(
 	var layer = 0
 	var tileset_source_id := 0
 	var tileset_source := tilemap.tile_set.get_source(tileset_source_id)
-	
-#	print("Size and offset")
-#	print(grid_size)
-#	print(grid_offset)
-#	print("___________")
 #
 	if tilemap_data.__type == "Tiles":
 		tiles = tilemap_data.gridTiles
@@ -74,11 +70,6 @@ static func create_tilemap(
 			Vector2i(tileset_source.texture_region_size),
 			Vector2i.ZERO
 		)
-#		print("---")
-#		print(cell_pixel_coords)
-#		print(cell_grid_coords)
 		tilemap.set_cell(layer, cell_grid_coords, tileset_source_id, tile_grid_coords)
-#		tilemap.set_cellv(grid_coords, tile_id, flip_x, flip_y)
-#		tilemap.set_cellv(grid_coords, tile.t, flip_x, flip_y)
 
 	return tilemap

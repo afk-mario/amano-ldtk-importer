@@ -27,7 +27,7 @@ static func get_layer_entities(layer_data: Dictionary, options: Dictionary) -> D
 
 
 static func create_new_entity(entity_data: Dictionary, options: Dictionary) -> Node:
-	if not entity_data.fieldInstances:
+	if entity_data.fieldInstances == null:
 		printerr("Could not load entity data: ", entity_data)
 		return null
 

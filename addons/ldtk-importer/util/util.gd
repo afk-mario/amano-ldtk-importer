@@ -17,7 +17,7 @@ static func remove_recursive(path: String) -> void:
 		# Remove current path
 		directory.remove(path)
 	else:
-		print("Error removing " + path)
+		printerr("Error removing " + path)
 
 
 static func get_save_folder_path(source_file: String, is_external_level := false) -> String:

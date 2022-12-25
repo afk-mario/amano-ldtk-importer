@@ -18,7 +18,6 @@ static func get_level_layer_instances(
 	for index in range(layer_instances.size()-1, -1, -1):
 		var layer_data = layer_instances[index]
 		var layer
-		print(layer_data.__type)
 		match layer_data.__type:
 			"Entities":
 				layer = create_entity_layer(layer_data, options)

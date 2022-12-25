@@ -8,6 +8,9 @@ static func tile_grid_coords_to_px_coords(
 
 	return Vector2i(pixel_tile_x, pixel_tile_y)
 
+static func tile_grid_coords_to_tile_id(grid_coords: Vector2i, atlas_grid_width: int) -> int:
+	return  grid_coords.x + grid_coords.y * atlas_grid_width;
+
 static func cell_px_coords_to_grid_coords(px_coords: Vector2i, grid_size: Vector2i, offset: Vector2i) -> Vector2i:
 	var x :int= floor(px_coords.x/grid_size.x)
 	var y :int= floor(px_coords.y/grid_size.y)
@@ -29,12 +32,12 @@ static func coord_id_to_grid_coords(coord_id: int, grid_width: int) -> Vector2:
 	return Vector2(grid_x, grid_y)
 
 
-#converts tileId to grid coordinates.
-static func tile_id_to_grid_coords(tile_id: int, atlas_grid_width: int) -> Vector2:
-	var grid_tile_x = tile_id - atlas_grid_width * int(tile_id / atlas_grid_width)
-	var grid_tile_y = int(tile_id / atlas_grid_width)
+#converts tileId to grid coordinagtes.
+static func tile_id_to_grid_coords(tile_id: int, atlas_grid_width: int) -> Vector2i:
+	var grid_tile_x := tile_id - atlas_grid_width * int(tile_id / atlas_grid_width)
+	var grid_tile_y := int(tile_id / atlas_grid_width)
 
-	return Vector2(grid_tile_x, grid_tile_y)
+	return Vector2i(grid_tile_x, grid_tile_y)
 
 
 #get tile region(Rect2) by tileId.
