@@ -3,7 +3,6 @@ extends EditorImportPlugin
 
 const Util = preload("util/util.gd")
 
-const Minimap = preload("src/ldtk-minimap.gd")
 const LdtkWorld = preload("src/ldtk-world.gd")
 const Level = preload("src/ldtk-level.gd")
 const Tileset = preload("src/ldtk-tileset.gd")
@@ -81,31 +80,6 @@ func _get_import_options(path: String, preset_index: int) -> Array:
 			"hint_string": "usage: 1,3,6 where the numbers represent the level index"
 		},
 		{"name": "pack_levels", "default_value": false},
-		{"name": "create_level_areas", "default_value": false},
-		{"name": "level_area_padding", "default_value": Vector2(0, 0)},
-		{"name": "level_area_opacity", "default_value": 0.5},
-		{
-			"name": "level_area_collision_layer",
-			"default_value": 64,
-			"property_hint": PROPERTY_HINT_LAYERS_2D_PHYSICS
-		},
-		{"name": "Minimaps", "default_value": "", "usage": PROPERTY_USAGE_GROUP},
-		{
-			"name": "generate_minimaps",
-			"default_value": false,
-			"hint_string": "If true, will generate an image using the data layers."
-		},
-		{
-			"name": "clean_minimaps",
-			"default_value": false,
-			"hint_string": "If true, will delete folder where the minimaps are gonna be saved"
-		},
-		{
-			"name": "ignore_data_layers",
-			"default_value": "",
-			"hint_string": "usage: layer_name1,layer_name2"
-		},
-		{"name": "ignore_data_values", "default_value": "", "hint_string": "usage: 1,2,3"},
 		{"name": "Entities", "default_value": "", "usage": PROPERTY_USAGE_GROUP},
 		{
 			"name": "import_custom_entities",
@@ -121,14 +95,7 @@ func _get_import_options(path: String, preset_index: int) -> Array:
 	]
 
 func _get_option_visibility(path: String, option_name: StringName, options: Dictionary) -> bool:
-	if (
-		option_name == "Level_Area_Scene_Path"
-		or option_name == "level_area_collision_layer"
-		or option_name == "level_area_padding"
-		or option_name == "level_area_opacity"
-	):
-		return options.create_level_areas
-	elif option_name == "Levels_To_import":
+	if option_name == "Levels_To_import":
 		return not options.import_all_levels
 	return true
 
@@ -137,7 +104,7 @@ func _import(source_file: String, save_path: String, options: Dictionary, platfo
 	var world_data := Util.parse_ldtk_file(source_file)
 	var has_external_levels: bool = world_data.externalLevels
 	var tilesets_dict := Tileset.get_tilesets_dict(
-		world_data.defs.tilesets, world_data.base_dir, options
+		source_file, world_data.defs.tilesets, world_data.base_dir, options
 	)
 
 	var world
@@ -148,14 +115,9 @@ func _import(source_file: String, save_path: String, options: Dictionary, platfo
 		gen_files.push_back(file_path)
 
 	if has_external_levels:
-		var levels_paths := Level.get_external_levels_paths(source_file, world_data, options)
-		world = LdtkWorld.create_world_with_external_levels(world_name, levels_paths)
+		printerr("External levels are not supported")
 	else:
 		var levels := Level.create_world_levels(source_file, world_data, tilesets_dict, options)
-
-		if options.clean_minimaps:
-			var minimap_save_path = Minimap.get_minimap_save_path(source_file)
-			Util.remove_recursive(minimap_save_path)
 
 		if options.pack_levels == true:
 			var levels_paths := Level.save_levels(levels, save_path, _get_save_extension())

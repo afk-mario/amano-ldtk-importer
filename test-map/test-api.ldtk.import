@@ -7,10 +7,10 @@ path="res://.godot/imported/test-api.ldtk-0d5e0e641310acdf0668fb90ad94707e.scn"
 
 [deps]
 
-files=["res://test-map/test-api/tilesets/2.res"]
+files=["res://test-map/test-api/tilesets/test-api-tileset-16x16.res"]
 
 source_file="res://test-map/test-api.ldtk"
-dest_files=["res://.godot/imported/test-api.ldtk-0d5e0e641310acdf0668fb90ad94707e.scn", "res://test-map/test-api/tilesets/2.res"]
+dest_files=["res://.godot/imported/test-api.ldtk-0d5e0e641310acdf0668fb90ad94707e.scn", "res://test-map/test-api/tilesets/test-api-tileset-16x16.res"]
 
 [params]
 
@@ -23,15 +23,6 @@ post_import_level_script=""
 import_all_levels=true
 Levels_To_import="0,1"
 pack_levels=false
-create_level_areas=false
-level_area_padding=Vector2(0, 0)
-Level_Area_Opacity=0.5
-level_area_collision_layer=64
-Minimaps=""
-generate_minimaps=true
-clean_minimaps=false
-ignore_data_layers=""
-ignore_data_values=""
 Entities=""
 import_custom_entities=true
 import_metadata=true

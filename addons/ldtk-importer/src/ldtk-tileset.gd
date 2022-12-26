@@ -3,52 +3,64 @@
 const Tile = preload("../util/tile.gd")
 const Util = preload("../util/util.gd")
 
+# Only create one custom data layer per tileset with the name LDtk
+const CUSTOM_DATA_LAYER_INDEX := 0
+const CUSTOM_DATA_LAYER_NAME := 'LDtk'
 
-static func get_tileset_save_path(source_file: String, is_external_level := false) -> String:
-	var save_path = Util.get_save_folder_path(source_file, is_external_level) + "/tilesets"
+static func get_tileset_save_path(source_file: String) -> String:
+	var save_path = Util.get_save_folder_path(source_file) + "/tilesets"
 	return save_path
 
 
-static func get_tilesets_dict(tilesets_data: Array, base_dir: String, options: Dictionary) -> Dictionary:
-	var dict := {}
+static func get_tilesets_dict(source_file: String, tilesets_data: Array, base_dir: String, options: Dictionary) -> Dictionary:
+	var dict :Dictionary = tilesets_data.reduce(
+		func(acc: Dictionary, curr: Dictionary):
+			var tile_grid_size :int= curr.tileGridSize
+			if not acc.has(tile_grid_size):
+				acc[tile_grid_size] = create_tileset(
+					source_file, tile_grid_size, options
+				)
+			create_tileset_source(acc[tile_grid_size], base_dir, curr, options)
+			return acc
+	,{}
+	)
+	
+	if not options.tileset_post_import_script.is_empty():
+		var script = load(options.tileset_post_import_script)
+		if not script or not script is GDScript:
+			printerr("Tileset post import script is not a GDScript.")
+			dict
 
-	for data in tilesets_data:
-		var tileset = create_tileset(base_dir, data, options)
-		if tileset:
-			dict[int(data.uid)] = tileset
+		script = script.new()
+		if not script.has_method("post_import"):
+			printerr("Tileset post import script does not have a 'post_import' method.")
+			return dict
 
+		for key in dict:
+			dict[key] = script.post_import(dict[key])
+	
 	return dict
 
-
-static func create_tileset_resources(source_file: String, tilesets_dict: Dictionary) -> Array:
-	var save_path = get_tileset_save_path(source_file)
-	var gen_files = []
-	var directory := DirAccess.open(source_file.get_base_dir())
-	directory.make_dir_recursive(save_path)
-
-	for key in tilesets_dict.keys():
-		var tileset: Resource = tilesets_dict.get(key)
-		var path = "%s/%s.%s" % [save_path, key, "res"]
-
-		var err = ResourceSaver.save(tileset, path)
-		if err == OK:
-			gen_files.push_back(path)
-
-	return gen_files
+static func create_tileset(source_file: String, tile_grid_size: int, options: Dictionary) -> TileSet:
+	var tileset := TileSet.new()
+	var source_file_name = source_file.get_file().get_slice(".", 0)
+	tileset.resource_name = source_file_name + "-tileset-" + str(tile_grid_size) + "x" + str(tile_grid_size)
+	tileset.tile_size = Vector2i(tile_grid_size, tile_grid_size)
+	tileset.add_custom_data_layer()
+	tileset.set_custom_data_layer_name(CUSTOM_DATA_LAYER_INDEX, CUSTOM_DATA_LAYER_NAME)
+	tileset.set_custom_data_layer_type(CUSTOM_DATA_LAYER_INDEX, TYPE_DICTIONARY)
+	
+	return tileset
 
 
-static func create_tileset(base_dir: String, tileset_data: Dictionary, options: Dictionary) -> TileSet:
+static func create_tileset_source(tileset: TileSet, base_dir: String, tileset_data: Dictionary, options: Dictionary) -> TileSetSource:
 	if tileset_data.relPath == null:
 		return null
 
-	var tileset := TileSet.new()
-	tileset.resource_name = tileset_data.identifier
-	
 	var texture_filepath :String = base_dir + "/" + tileset_data.relPath
 	var texture := load(texture_filepath)
 	var texture_image :Image = texture.get_image()
 	
-	var collision_tiles_ids := get_tiles_ids_by_tag(tileset_data, "Collision")
 	var tileset_source := TileSetAtlasSource.new()
 	tileset_source.texture = texture
 
@@ -65,7 +77,7 @@ static func create_tileset(base_dir: String, tileset_data: Dictionary, options: 
 	var tile_size := Vector2i(tileset_data.tileGridSize, tileset_data.tileGridSize)
 	tileset.tile_size = tile_size
 	tileset_source.texture_region_size = tile_size
-	tileset.add_source(tileset_source)
+	tileset.add_source(tileset_source, tileset_data.uid)
 	
 	for y in range(0, grid_height):
 		for x in range(0, grid_with):
@@ -80,33 +92,14 @@ static func create_tileset(base_dir: String, tileset_data: Dictionary, options: 
 	var tiles_data := get_tiles_data(tileset_data)
 	
 	if tiles_data.keys().size() > 0:
-		var custom_data_layer_index := 0
-		tileset.add_custom_data_layer()
-		tileset.set_custom_data_layer_name(custom_data_layer_index, "LDtk")
-		tileset.set_custom_data_layer_type(custom_data_layer_index, TYPE_DICTIONARY)
-	
 		for tile_id in tiles_data:
 			var data :Dictionary= tiles_data[tile_id]
 			var alternative_tile := 0
 			var grid_coords := Tile.tile_id_to_grid_coords(tile_id, grid_with)
 			var tile_data :TileData = tileset_source.get_tile_data(grid_coords, alternative_tile)
-			tile_data.set_custom_data_by_layer_id(custom_data_layer_index, data)
-		
+			tile_data.set_custom_data_by_layer_id(CUSTOM_DATA_LAYER_INDEX, data)
 	
-	if not options.tileset_post_import_script.is_empty():
-		var script = load(options.tileset_post_import_script)
-		if not script or not script is GDScript:
-			printerr("Tileset post import script is not a GDScript.")
-			return tileset
-
-		script = script.new()
-		if not script.has_method("post_import"):
-			printerr("Tileset post import script does not have a 'post_import' method.")
-			return tileset
-
-		tileset = script.post_import(tileset)
-	
-	return tileset
+	return tileset_source
 
 static func get_tiles_data(tileset_data: Dictionary) -> Dictionary:
 	var dict = {}
@@ -127,19 +120,18 @@ static func get_tiles_data(tileset_data: Dictionary) -> Dictionary:
 	
 	return dict
 
-static func get_tiles_ids_by_tag(data: Dictionary, tag_id: String) -> Array:
-	var tags: Array = data.enumTags
-	if tags.size() == 0:
-		return []
+static func create_tileset_resources(source_file: String, tilesets_dict: Dictionary) -> Array:
+	var save_path = get_tileset_save_path(source_file)
+	var gen_files = []
+	var directory := DirAccess.open(source_file.get_base_dir())
+	directory.make_dir_recursive(save_path)
 
-	var solidEnum = null
+	for key in tilesets_dict.keys():
+		var tileset: Resource = tilesets_dict.get(key)
+		var path = "%s/%s.%s" % [save_path, tileset.resource_name, "res"]
 
-	for tag in tags:
-		if tag.enumValueId == tag_id:
-			solidEnum = tag
+		var err = ResourceSaver.save(tileset, path)
+		if err == OK:
+			gen_files.push_back(path)
 
-	if solidEnum:
-		return solidEnum.tileIds.map(func(id): return int(id))
-
-	return []
-
+	return gen_files

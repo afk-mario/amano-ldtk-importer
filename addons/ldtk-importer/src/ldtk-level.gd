@@ -2,38 +2,40 @@
 const Util = preload("../util/util.gd")
 
 const Layer = preload("ldtk-layer.gd")
-const Minimap = preload("ldtk-minimap.gd")
 
 
 static func get_level_save_path(source_file: String) -> String:
 	var save_path = Util.get_save_folder_path(source_file) + "/levels"
 	return save_path
 
-
-static func get_external_levels_paths(
-	source_file: String, world_data: Dictionary, options: Dictionary
-) -> Array:
-	var directory_path = source_file.get_base_dir()
-	var level_indices = Util.get_level_indicies(world_data, options)
-	var levels_paths := []
-
-	for i in level_indices:
-		var level_data = world_data.levels[i]
-		var path = directory_path + "/" + level_data.externalRelPath
-		levels_paths.append(path)
-
-	return levels_paths
-
-
 static func create_world_levels(
 	source_file: String, world_data: Dictionary, tilesets_dict: Dictionary, options: Dictionary
 ) -> Array:
 	var level_indices = Util.get_level_indicies(world_data, options)
 	var levels := []
-
+	
+	
 	for i in level_indices:
 		var level_data = world_data.levels[i]
-		var level = create_level(source_file, level_data, tilesets_dict, options)
+		# Group layers defs in to grid size level and add the index information
+		var current_index = 0
+		var layers_data := []
+	
+		for j in range(0, level_data.layerInstances.size()):
+			var layer_data :Dictionary = level_data.layerInstances[j]
+			layer_data.index = j
+			layers_data.append(layer_data)
+		
+		var layers_dict :Dictionary = layers_data.reduce(
+			func (acc, curr):
+				var grid_size :int=curr.__gridSize
+				if acc.get(grid_size) == null:
+					acc[grid_size] = {}
+				acc[int(grid_size)][int(curr.layerDefUid)] = curr
+				return acc
+		,{})
+		
+		var level = create_level(source_file, level_data, layers_dict, tilesets_dict, options)
 		levels.push_back(level)
 
 	return levels
@@ -65,20 +67,17 @@ static func pack_level(level: Node2D) -> PackedScene:
 static func create_level(
 	source_file: String,
 	level_data: Dictionary,
+	layers_dict: Dictionary,
 	tilesets_dict: Dictionary,
-	options: Dictionary,
-	is_external_level := false
+	options: Dictionary
 ) -> Node2D:
-	if options.generate_minimaps:
-		Minimap.create_level_mini_map(level_data, source_file, options, is_external_level)
-
 	var level = Node2D.new()
 
 	level.name = level_data.identifier
 	level.position = Vector2(level_data.worldX, level_data.worldY)
 	
 	var layer_instances = Layer.get_level_layer_instances(
-		source_file, level_data, tilesets_dict, options, is_external_level
+		source_file, level_data, layers_dict, tilesets_dict, options
 	)
 
 	for layer_instance in layer_instances:
@@ -95,45 +94,10 @@ static func create_level(
 			printerr("Post import script does not have a 'post_import' method.")
 			return null
 
-		level = script.post_import(level)
+		level = script.post_import(level, level_data, source_file)
 
 		if not level or not level is Node2D:
 			printerr("Invalid scene returned from post import script.")
 			return null
-	
-	if options.create_level_areas:
-		var level_area = get_level_area(level_data, options)
-		level.add_child(level_area)
 
 	return level
-
-
-static func get_level_area(level_data: Dictionary, options: Dictionary) -> Area2D:
-	var level_meta = {}
-	for field in level_data.fieldInstances:
-		level_meta[field.__identifier] = field.__value
-
-	var level_area = Area2D.new()
-	var level_size = Vector2(level_data.pxWid, level_data.pxHei)
-	var level_extents = (level_size / 2) + options.level_area_padding
-	var area_collision_layer = options.level_area_collision_layer
-
-	level_area.name = "Level Area"
-
-	if level_meta.has("Color"):
-		level_area.modulate = Color(level_meta.Color)
-		level_area.modulate.a = options.level_area_opacity
-
-	level_area.position.x = level_extents.x
-	level_area.position.y = level_extents.y
-	level_area.collision_layer = area_collision_layer
-	level_area.collision_mask = 0
-
-	var level_area_shape = CollisionShape2D.new()
-	level_area_shape.name = "Level Area Collission Shape"
-	level_area_shape.shape = RectangleShape2D.new()
-	level_area_shape.shape.extents = level_extents
-
-	level_area.add_child(level_area_shape)
-
-	return level_area

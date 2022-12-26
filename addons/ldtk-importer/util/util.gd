@@ -20,12 +20,8 @@ static func remove_recursive(path: String) -> void:
 		printerr("Error removing " + path)
 
 
-static func get_save_folder_path(source_file: String, is_external_level := false) -> String:
+static func get_save_folder_path(source_file: String) -> String:
 	var directory_path = source_file.get_base_dir()
-
-	if is_external_level:
-		return directory_path
-
 	var source_file_name = source_file.get_file().get_slice(".", 0)
 	var save_path = directory_path + "/" + source_file_name
 

@@ -1,17 +1,17 @@
 @tool
 
-const Util = preload("../util/util.gd")
+const Util = preload("res://addons/ldtk-importer/util/util.gd")
 
 
-static func get_minimap_save_path(source_file: String, is_external_level := false) -> String:
-	var save_path = Util.get_save_folder_path(source_file, is_external_level) + "/minimaps"
+static func get_minimap_save_path(source_file: String) -> String:
+	var save_path = Util.get_save_folder_path(source_file) + "/minimaps"
 	return save_path
 
 
 static func create_level_mini_map(
-	level_data: Dictionary, source_file: String, options: Dictionary, is_external_level := false
+	level_data: Dictionary, source_file: String, options: Dictionary
 ) -> void:
-	var save_path = get_minimap_save_path(source_file, is_external_level)
+	var save_path = get_minimap_save_path(source_file)
 	var extension = "png"
 	var save_file_name = level_data.identifier + "." + extension
 	var ignore_layers = options.ignore_data_layers.split(",", false)
@@ -22,11 +22,11 @@ static func create_level_mini_map(
 
 	var width: int = level_data.pxWid / 8
 	var height: int = level_data.pxHei / 8
+
 	var data_layer = null
 	var colors = {}
 
-	var img = Image.new()
-	img.create(width, height, false, Image.FORMAT_RGBA8)
+	var img = Image.create(width, height, false, Image.FORMAT_RGBA8)
 	img.fill(bg_color)
 
 	for layer in level_data.layerInstances:
