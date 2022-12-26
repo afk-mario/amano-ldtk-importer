@@ -69,7 +69,7 @@ static func create_level(
 	options: Dictionary,
 	is_external_level := false
 ) -> Node2D:
-	if options.Generate_Minimaps:
+	if options.generate_minimaps:
 		Minimap.create_level_mini_map(level_data, source_file, options, is_external_level)
 
 	var level = Node2D.new()
@@ -101,7 +101,7 @@ static func create_level(
 			printerr("Invalid scene returned from post import script.")
 			return null
 	
-	if options.Create_Level_Areas:
+	if options.create_level_areas:
 		var level_area = get_level_area(level_data, options)
 		level.add_child(level_area)
 
@@ -115,14 +115,14 @@ static func get_level_area(level_data: Dictionary, options: Dictionary) -> Area2
 
 	var level_area = Area2D.new()
 	var level_size = Vector2(level_data.pxWid, level_data.pxHei)
-	var level_extents = (level_size / 2) + options.Level_Area_Padding
-	var area_collision_layer = options.Level_Area_Collision_Layer
+	var level_extents = (level_size / 2) + options.level_area_padding
+	var area_collision_layer = options.level_area_collision_layer
 
 	level_area.name = "Level Area"
 
 	if level_meta.has("Color"):
 		level_area.modulate = Color(level_meta.Color)
-		level_area.modulate.a = options.Level_Area_Opacity
+		level_area.modulate.a = options.level_area_opacity
 
 	level_area.position.x = level_extents.x
 	level_area.position.y = level_extents.y

@@ -12,7 +12,6 @@ static func create_tilemap(
 	options: Dictionary,
 	is_external_level := false
 ) -> TileMap:
-	var import_collisions :bool = options.Import_Collisions
 	var tilemap := TileMap.new()
 
 	if not tilemap_data.__tilesetDefUid:
@@ -47,9 +46,10 @@ static func create_tilemap(
 	var grid_offset := Vector2i(tilemap_data.__pxTotalOffsetX, tilemap_data.__pxTotalOffsetY)
 	# TODO: Get this somehow that it's not hardcoded
 	var layer = 0
-	var tileset_source_id := 0
+	var source_index := 0
+	var tileset_source_id := tilemap.tile_set.get_source_id(source_index)
 	var tileset_source := tilemap.tile_set.get_source(tileset_source_id)
-#
+
 	if tilemap_data.__type == "Tiles":
 		tiles = tilemap_data.gridTiles
 		coordinate_index = 0

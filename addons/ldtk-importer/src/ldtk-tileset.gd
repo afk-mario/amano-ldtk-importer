@@ -41,7 +41,6 @@ static func create_tileset(base_dir: String, tileset_data: Dictionary, options: 
 	if tileset_data.relPath == null:
 		return null
 
-	var import_collisions :bool = options.Import_Collisions
 	var tileset := TileSet.new()
 	tileset.resource_name = tileset_data.identifier
 	
@@ -63,23 +62,11 @@ static func create_tileset(base_dir: String, tileset_data: Dictionary, options: 
 	)
 
 	var gridSize := grid_with * grid_height
-	var shape_id := 0
 	var tile_size := Vector2i(tileset_data.tileGridSize, tileset_data.tileGridSize)
-	var tile_extents := Vector2(tile_size.x/2, tile_size.y/2)
 	tileset.tile_size = tile_size
 	tileset_source.texture_region_size = tile_size
-	var layer_id := 0
-	var tileset_source_id := tileset.add_source(tileset_source)
+	tileset.add_source(tileset_source)
 	
-	# TODO: Instead of triying to guess the best way create collisions for the user
-	# import all the custom data from LDtk including the enum tags and let a 
-	# plugin modify the results as they want, for example creating a square
-	# collision shape per tile with a certain tag like here.
-	if import_collisions:
-		tileset.add_physics_layer()
-		tileset.set_physics_layer_collision_layer(layer_id, options.Collision_Layer)
-		tileset.set_physics_layer_collision_mask(layer_id, 0)
-
 	for y in range(0, grid_height):
 		for x in range(0, grid_with):
 			var grid_coords := Vector2i(x,y)
@@ -88,32 +75,57 @@ static func create_tileset(base_dir: String, tileset_data: Dictionary, options: 
 
 			if not tile_image.is_invisible():
 				tileset_source.create_tile(grid_coords)
+					
 
-				if import_collisions:
-					var tile_id := Tile.tile_grid_coords_to_tile_id(grid_coords, grid_with)
-					var has_collision = collision_tiles_ids.has(tile_id)
+	var tiles_data := get_tiles_data(tileset_data)
+	
+	if tiles_data.keys().size() > 0:
+		var custom_data_layer_index := 0
+		tileset.add_custom_data_layer()
+		tileset.set_custom_data_layer_name(custom_data_layer_index, "LDtk")
+		tileset.set_custom_data_layer_type(custom_data_layer_index, TYPE_DICTIONARY)
+	
+		for tile_id in tiles_data:
+			var data :Dictionary= tiles_data[tile_id]
+			var alternative_tile := 0
+			var grid_coords := Tile.tile_id_to_grid_coords(tile_id, grid_with)
+			var tile_data :TileData = tileset_source.get_tile_data(grid_coords, alternative_tile)
+			tile_data.set_custom_data_by_layer_id(custom_data_layer_index, data)
+		
+	
+	if not options.tileset_post_import_script.is_empty():
+		var script = load(options.tileset_post_import_script)
+		if not script or not script is GDScript:
+			printerr("Tileset post import script is not a GDScript.")
+			return tileset
 
-					if has_collision:
-						var alternative_tile := 0
-						var tile_data :TileData = tileset_source.get_tile_data(grid_coords, alternative_tile)
-						tile_data.add_collision_polygon(layer_id)
-						tile_data.set_collision_polygon_points(
-							layer_id, 
-							0, 
-							PackedVector2Array(
-								[
-									Vector2(-tile_extents.x, -tile_extents.y), 
-									Vector2(-tile_extents.x, tile_extents.y), 
-									Vector2(tile_extents.x, tile_extents.y),  
-									Vector2(tile_extents.x, -tile_extents.y)
-								]
-							)
-						)
+		script = script.new()
+		if not script.has_method("post_import"):
+			printerr("Tileset post import script does not have a 'post_import' method.")
+			return tileset
 
-					shape_id += 1
-
+		tileset = script.post_import(tileset)
+	
 	return tileset
 
+static func get_tiles_data(tileset_data: Dictionary) -> Dictionary:
+	var dict = {}
+	for tag in tileset_data.enumTags:
+		var value = tag.enumValueId
+		var tiles_ids :Array= tag.tileIds
+		
+		for tile_id in tiles_ids:
+			dict[int(tile_id)] = {
+				"enum": value
+			}
+		
+	for tile_data in tileset_data.customData:
+		var tile_id :int= tile_data.tileId
+		var data :Dictionary= JSON.parse_string(tile_data.data)
+		var prev_data :Dictionary = dict.get(tile_id, {})
+		dict[tile_id] = data.merge(prev_data)
+	
+	return dict
 
 static func get_tiles_ids_by_tag(data: Dictionary, tag_id: String) -> Array:
 	var tags: Array = data.enumTags

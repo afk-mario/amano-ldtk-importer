@@ -14,8 +14,8 @@ static func create_level_mini_map(
 	var save_path = get_minimap_save_path(source_file, is_external_level)
 	var extension = "png"
 	var save_file_name = level_data.identifier + "." + extension
-	var ignore_layers = options.Ignore_Data_Layers.split(",", false)
-	var ignore_values = options.Ignore_Data_Values.split_floats(",", false)
+	var ignore_layers = options.ignore_data_layers.split(",", false)
+	var ignore_values = options.ignore_data_values.split_floats(",", false)
 	var bg_color := Color(level_data.__bgColor)
 	var directory := DirAccess.open(source_file.get_base_dir())
 	directory.make_dir_recursive(save_path)

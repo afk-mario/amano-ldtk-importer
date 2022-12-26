@@ -54,17 +54,18 @@ func _get_preset_name(preset: int) -> String:
 func _get_import_options(path: String, preset_index: int) -> Array:
 	return [
 		{
-			"name": "post_import_script",
+			"name": "world_post_import_script",
 			"default_value": "",
 			"property_hint": PROPERTY_HINT_FILE,
 			"hint_string": "*.gd;GDScript"
 		},
-		{"name": "Collisions", "default_value": "", "usage": PROPERTY_USAGE_GROUP},
-		{"name": "Import_Collisions", "default_value": preset_index == Presets.PRESET_COLLISIONS},
+		{"name": "Tilesets", "default_value": "", "usage": PROPERTY_USAGE_GROUP},
+		{"name": "import_tileset_custom_data", "default_value": true},
 		{
-			"name": "Collision_Layer",
-			"default_value": 2,
-			"property_hint": PROPERTY_HINT_LAYERS_2D_PHYSICS
+			"name": "tileset_post_import_script",
+			"default_value": "",
+			"property_hint": PROPERTY_HINT_FILE,
+			"hint_string": "*.gd;GDScript"
 		},
 		{"name": "Levels", "default_value": "", "usage": PROPERTY_USAGE_GROUP},
 		{
@@ -73,47 +74,47 @@ func _get_import_options(path: String, preset_index: int) -> Array:
 			"property_hint": PROPERTY_HINT_FILE,
 			"hint_string": "*.gd;GDScript"
 		},
-		{"name": "Import_All_Levels", "default_value": true},
+		{"name": "import_all_levels", "default_value": true},
 		{
 			"name": "Levels_To_import",
 			"default_value": "0,1",
 			"hint_string": "usage: 1,3,6 where the numbers represent the level index"
 		},
 		{"name": "pack_levels", "default_value": false},
-		{"name": "Create_Level_Areas", "default_value": false},
-		{"name": "Level_Area_Padding", "default_value": Vector2(0, 0)},
-		{"name": "Level_Area_Opacity", "default_value": 0.5},
+		{"name": "create_level_areas", "default_value": false},
+		{"name": "level_area_padding", "default_value": Vector2(0, 0)},
+		{"name": "level_area_opacity", "default_value": 0.5},
 		{
-			"name": "Level_Area_Collision_Layer",
+			"name": "level_area_collision_layer",
 			"default_value": 64,
 			"property_hint": PROPERTY_HINT_LAYERS_2D_PHYSICS
 		},
 		{"name": "Minimaps", "default_value": "", "usage": PROPERTY_USAGE_GROUP},
 		{
-			"name": "Generate_Minimaps",
-			"default_value": true,
+			"name": "generate_minimaps",
+			"default_value": false,
 			"hint_string": "If true, will generate an image using the data layers."
 		},
 		{
-			"name": "Clean_Minimaps",
+			"name": "clean_minimaps",
 			"default_value": false,
 			"hint_string": "If true, will delete folder where the minimaps are gonna be saved"
 		},
 		{
-			"name": "Ignore_Data_Layers",
+			"name": "ignore_data_layers",
 			"default_value": "",
 			"hint_string": "usage: layer_name1,layer_name2"
 		},
-		{"name": "Ignore_Data_Values", "default_value": "", "hint_string": "usage: 1,2,3"},
+		{"name": "ignore_data_values", "default_value": "", "hint_string": "usage: 1,2,3"},
 		{"name": "Entities", "default_value": "", "usage": PROPERTY_USAGE_GROUP},
 		{
-			"name": "Import_Custom_Entities",
+			"name": "import_custom_entities",
 			"default_value": true,
 			"hint_string":
 			"If true, will only use this project's scenes. If false, will import objects as simple scenes."
 		},
 		{
-			"name": "Import_Metadata",
+			"name": "import_metadata",
 			"default_value": true,
 			"hint_string": "If true, will import entity fields as metadata."
 		}
@@ -122,19 +123,13 @@ func _get_import_options(path: String, preset_index: int) -> Array:
 func _get_option_visibility(path: String, option_name: StringName, options: Dictionary) -> bool:
 	if (
 		option_name == "Level_Area_Scene_Path"
-		or option_name == "Level_Area_Collision_Layer"
-		or option_name == "Level_Area_Padding"
-		or option_name == "Level_Area_Opacity"
+		or option_name == "level_area_collision_layer"
+		or option_name == "level_area_padding"
+		or option_name == "level_area_opacity"
 	):
-		return options.Create_Level_Areas
-	if (
-		option_name == "Collision_Layer"
-		or option_name == "One_Way_Collision_Layer"
-		or option_name == "Only_Player_Collision_Layer"
-	):
-		return options.Import_Collisions
+		return options.create_level_areas
 	elif option_name == "Levels_To_import":
-		return not options.Import_All_Levels
+		return not options.import_all_levels
 	return true
 
 	
@@ -158,7 +153,7 @@ func _import(source_file: String, save_path: String, options: Dictionary, platfo
 	else:
 		var levels := Level.create_world_levels(source_file, world_data, tilesets_dict, options)
 
-		if options.Clean_Minimaps:
+		if options.clean_minimaps:
 			var minimap_save_path = Minimap.get_minimap_save_path(source_file)
 			Util.remove_recursive(minimap_save_path)
 
@@ -172,15 +167,15 @@ func _import(source_file: String, save_path: String, options: Dictionary, platfo
 		else:
 			world = LdtkWorld.create_world(world_name, levels)
 
-	if not options.post_import_script.is_empty():
-		var script = load(options.post_import_script)
+	if not options.world_post_import_script.is_empty():
+		var script = load(options.world_post_import_script)
 		if not script or not script is GDScript:
 			printerr("Post import script is not a GDScript.")
 			return ERR_INVALID_PARAMETER
 
 		script = script.new()
 		if not script.has_method("post_import"):
-			printerr("Post import script does not have a 'post_import' method.")
+			printerr("World post import script does not have a 'post_import' method.")
 			return ERR_INVALID_PARAMETER
 
 		world = script.post_import(world)

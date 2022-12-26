@@ -52,7 +52,7 @@ static func recursive_set_owner(node: Node, new_owner: Node, root: Node):
 
 
 static func get_level_indicies(world_data: Dictionary, options: Dictionary) -> Array:
-	var import_all = options.Import_All_Levels
+	var import_all = options.import_all_levels
 	var level_indices = []
 
 	if import_all:

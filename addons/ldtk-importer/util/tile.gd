@@ -24,14 +24,6 @@ static func tile_id_to_px_coords(
 	return tile_grid_coords_to_px_coords(grid_coords, atlas_grid_size, padding, spacing)
 
 
-#converts coord_id to grid coordinates.
-static func coord_id_to_grid_coords(coord_id: int, grid_width: int) -> Vector2:
-	var grid_y = floor(coord_id / grid_width)
-	var grid_x = coord_id - grid_y * grid_width
-
-	return Vector2(grid_x, grid_y)
-
-
 #converts tileId to grid coordinagtes.
 static func tile_id_to_grid_coords(tile_id: int, atlas_grid_width: int) -> Vector2i:
 	var grid_tile_x := tile_id - atlas_grid_width * int(tile_id / atlas_grid_width)

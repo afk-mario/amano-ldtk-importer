@@ -55,7 +55,7 @@ static func create_new_entity(entity_data: Dictionary, options: Dictionary) -> N
 					new_entity = StaticBody2D.new()
 					new_entity.name = node_type
 				_:
-					if not options.Import_Custom_Entities:
+					if not options.import_custom_entities:
 						return null
 
 					new_entity = create_custom_entity(entity_data, node_type, metadata)
