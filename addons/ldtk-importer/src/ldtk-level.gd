@@ -35,7 +35,7 @@ static func create_world_levels(
 				return acc
 		,{})
 		
-		var level = create_level(source_file, level_data, layers_dict, tilesets_dict, options)
+		var level = create_level(source_file, world_data.base_dir, level_data,layers_dict, tilesets_dict, options)
 		levels.push_back(level)
 
 	return levels
@@ -66,6 +66,7 @@ static func pack_level(level: Node2D) -> PackedScene:
 
 static func create_level(
 	source_file: String,
+	base_dir: String,
 	level_data: Dictionary,
 	layers_dict: Dictionary,
 	tilesets_dict: Dictionary,
@@ -75,6 +76,29 @@ static func create_level(
 
 	level.name = level_data.identifier
 	level.position = Vector2(level_data.worldX, level_data.worldY)
+
+	if level_data.bgRelPath != null:
+		var bg_data :Dictionary= level_data.__bgPos
+		var sprite = Sprite2D.new()
+		var texture_filepath :String = base_dir + "/" + level_data.bgRelPath
+		var texture = load(texture_filepath)
+		sprite.name = "Bg image"
+		sprite.centered = false
+		sprite.texture = texture
+		if bg_data:
+			if bg_data.cropRect:
+				sprite.region_enabled = true
+				sprite.region_rect = Rect2(
+					bg_data.cropRect[0], 
+					bg_data.cropRect[1], 
+					bg_data.cropRect[2], 
+					bg_data.cropRect[3]
+				)
+			if bg_data.scale:
+				sprite.scale = Vector2(bg_data.scale[0], bg_data.scale[1])
+			if bg_data.topLeftPx:
+				sprite.offset = Vector2(bg_data.topLeftPx[0], bg_data.topLeftPx[1])
+		level.add_child(sprite)
 	
 	var layer_instances = Layer.get_level_layer_instances(
 		source_file, level_data, layers_dict, tilesets_dict, options
