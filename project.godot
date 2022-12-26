@@ -16,7 +16,7 @@ config/icon="res://icon.svg"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/ldtk-importer/plugin.cfg")
+enabled=PackedStringArray("res://addons/amano-ldtk-importer/plugin.cfg")
 
 [rendering]
 
