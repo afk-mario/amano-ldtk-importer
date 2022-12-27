@@ -25,6 +25,7 @@ LDtk importer for Godot 4
 	- Tilesets
 	- Levels
 	- World
+- [x] Import level background images 
 - [ ] Import LDtk Entities
 - [ ] Import int layers without tile atlases
 - [ ] Import CSV from simple LDtk export
