@@ -33,6 +33,7 @@ LDtk importer for Godot 4
 
 - [Godot4 doesn't support flipped tiles](https://github.com/godotengine/godot-proposals/issues/3967)
 - [Can't support LDtk external with the current LDtk implementation](https://github.com/deepnight/ldtk/issues/734)
+- LDtk support for multiple tiles in a single layer using auto tile rules, this plugin will not support that.
 
 ## Post Import Scripts
 
