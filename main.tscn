@@ -1,7 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://dangru8kkrvni"]
+[gd_scene load_steps=4 format=3 uid="uid://dangru8kkrvni"]
 
 [ext_resource type="Texture2D" uid="uid://3ye4ujewh7n7" path="res://test-map/Inca_front_by_Kronbits-extended.png" id="1_d7luc"]
-[ext_resource type="Texture2D" uid="uid://g24t1wwdrdny" path="res://test-map/Beach by deepnight.png" id="2_b2rj2"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_uawoe"]
 texture = ExtResource("1_d7luc")
@@ -304,6 +303,3 @@ layer_1/y_sort_enabled = false
 layer_1/y_sort_origin = 0
 layer_1/z_index = 0
 layer_1/tile_data = PackedInt32Array()
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_b2rj2")

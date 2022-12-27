@@ -99,12 +99,12 @@ func _get_option_visibility(path: String, option_name: StringName, options: Dict
 		return not options.import_all_levels
 	return true
 
-	
+
 func _import(source_file: String, save_path: String, options: Dictionary, platform_variants: Array, gen_files: Array) -> int:
 	var world_data := Util.parse_ldtk_file(source_file)
 	var has_external_levels: bool = world_data.externalLevels
 	var tilesets_dict := Tileset.get_tilesets_dict(
-		source_file, world_data.defs.tilesets, world_data.base_dir, options
+		source_file, world_data, options
 	)
 
 	var world

@@ -1,7 +1,7 @@
 @tool
 extends Node
 
-const Tile = preload("res://addons/ldtk-importer/util/tile.gd")
+const Tile = preload("res://addons/amano-ldtk-importer/util/tile.gd")
 
 var collision_layer := 0
 

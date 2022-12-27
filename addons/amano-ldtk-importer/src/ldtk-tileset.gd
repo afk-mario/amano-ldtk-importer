@@ -12,7 +12,10 @@ static func get_tileset_save_path(source_file: String) -> String:
 	return save_path
 
 
-static func get_tilesets_dict(source_file: String, tilesets_data: Array, base_dir: String, options: Dictionary) -> Dictionary:
+static func get_tilesets_dict(source_file: String, world_data: Dictionary, options: Dictionary) -> Dictionary:
+	var base_dir :String = world_data.base_dir
+	var tilesets_data: Array = world_data.defs.tilesets
+	var layers_data: Array = world_data.defs.layers
 	var dict :Dictionary = tilesets_data.reduce(
 		func(acc: Dictionary, curr: Dictionary):
 			var tile_grid_size :int= curr.tileGridSize
@@ -24,7 +27,18 @@ static func get_tilesets_dict(source_file: String, tilesets_data: Array, base_di
 			return acc
 	,{}
 	)
-	
+
+	for layer_data in layers_data:
+		if layer_data.type == "IntGrid" and layer_data.intGridValues.size() > 0:
+			var tile_grid_size :int= layer_data.gridSize
+			if not dict.has(tile_grid_size):
+				dict[tile_grid_size] = create_tileset(
+					source_file, tile_grid_size, options
+				)
+			var tile_set :TileSet = dict[tile_grid_size]
+			create_tileset_int_source(tile_set, layer_data)
+
+
 	if not options.tileset_post_import_script.is_empty():
 		var script = load(options.tileset_post_import_script)
 		if not script or not script is GDScript:
@@ -38,7 +52,7 @@ static func get_tilesets_dict(source_file: String, tilesets_data: Array, base_di
 
 		for key in dict:
 			dict[key] = script.post_import(dict[key])
-	
+
 	return dict
 
 static func create_tileset(source_file: String, tile_grid_size: int, options: Dictionary) -> TileSet:
@@ -49,7 +63,7 @@ static func create_tileset(source_file: String, tile_grid_size: int, options: Di
 	tileset.add_custom_data_layer()
 	tileset.set_custom_data_layer_name(CUSTOM_DATA_LAYER_INDEX, CUSTOM_DATA_LAYER_NAME)
 	tileset.set_custom_data_layer_type(CUSTOM_DATA_LAYER_INDEX, TYPE_DICTIONARY)
-	
+
 	return tileset
 
 
@@ -60,7 +74,7 @@ static func create_tileset_source(tileset: TileSet, base_dir: String, tileset_da
 	var texture_filepath :String = base_dir + "/" + tileset_data.relPath
 	var texture := load(texture_filepath)
 	var texture_image :Image = texture.get_image()
-	
+
 	var tileset_source := TileSetAtlasSource.new()
 	tileset_source.texture = texture
 
@@ -75,10 +89,9 @@ static func create_tileset_source(tileset: TileSet, base_dir: String, tileset_da
 
 	var gridSize := grid_with * grid_height
 	var tile_size := Vector2i(tileset_data.tileGridSize, tileset_data.tileGridSize)
-	tileset.tile_size = tile_size
 	tileset_source.texture_region_size = tile_size
 	tileset.add_source(tileset_source, tileset_data.uid)
-	
+
 	for y in range(0, grid_height):
 		for x in range(0, grid_with):
 			var grid_coords := Vector2i(x,y)
@@ -87,10 +100,10 @@ static func create_tileset_source(tileset: TileSet, base_dir: String, tileset_da
 
 			if not tile_image.is_invisible():
 				tileset_source.create_tile(grid_coords)
-					
+
 
 	var tiles_data := get_tiles_data(tileset_data)
-	
+
 	if tiles_data.keys().size() > 0:
 		for tile_id in tiles_data:
 			var data :Dictionary= tiles_data[tile_id]
@@ -98,7 +111,43 @@ static func create_tileset_source(tileset: TileSet, base_dir: String, tileset_da
 			var grid_coords := Tile.tile_id_to_grid_coords(tile_id, grid_with)
 			var tile_data :TileData = tileset_source.get_tile_data(grid_coords, alternative_tile)
 			tile_data.set_custom_data_by_layer_id(CUSTOM_DATA_LAYER_INDEX, data)
-	
+			tileset.set_custom_data_layer_type(CUSTOM_DATA_LAYER_INDEX, TYPE_DICTIONARY)
+
+	return tileset_source
+
+static func create_tileset_int_source(tileset: TileSet, layer_data: Dictionary) -> TileSetAtlasSource:
+	var tileset_source := TileSetAtlasSource.new()
+	var int_grid_values :Array = layer_data.intGridValues
+	var tile_grid_size :int= layer_data.gridSize
+	var width := tile_grid_size * int_grid_values.size()
+	var height := tile_grid_size
+	var image = Image.create(width, height, false, Image.FORMAT_RGB8)
+
+	tileset.add_custom_data_layer()
+	var data_layer_index := tileset.get_custom_data_layers_count() - 1
+	tileset.set_custom_data_layer_name(data_layer_index, layer_data.identifier)
+	tileset.set_custom_data_layer_type(data_layer_index, TYPE_INT)
+
+	for index in range(0, int_grid_values.size()):
+		var value :Dictionary = int_grid_values[index]
+		var rect := Rect2i(index * tile_grid_size, 0, tile_grid_size, tile_grid_size)
+		var color := Color.from_string(value.color, Color.MAGENTA)
+		image.fill_rect(rect, color)
+
+	var texture = ImageTexture.create_from_image(image)
+	tileset_source.texture = texture
+	var tile_size := Vector2i(tile_grid_size, tile_grid_size)
+	tileset_source.texture_region_size = tile_size
+	tileset.add_source(tileset_source, layer_data.uid)
+
+	for index in range(0, int_grid_values.size()):
+		var data :Dictionary = int_grid_values[index]
+		var grid_coords := Vector2i(index, 0)
+		tileset_source.create_tile(grid_coords)
+		var alternative_tile := 0
+		var tile_data :TileData = tileset_source.get_tile_data(grid_coords, alternative_tile)
+		tile_data.set_custom_data_by_layer_id(data_layer_index, data.value)
+
 	return tileset_source
 
 static func get_tiles_data(tileset_data: Dictionary) -> Dictionary:
@@ -106,18 +155,18 @@ static func get_tiles_data(tileset_data: Dictionary) -> Dictionary:
 	for tag in tileset_data.enumTags:
 		var value = tag.enumValueId
 		var tiles_ids :Array= tag.tileIds
-		
+
 		for tile_id in tiles_ids:
 			dict[int(tile_id)] = {
 				"enum": value
 			}
-		
+
 	for tile_data in tileset_data.customData:
 		var tile_id :int= tile_data.tileId
 		var data :Dictionary= JSON.parse_string(tile_data.data)
 		var prev_data :Dictionary = dict.get(tile_id, {})
 		dict[tile_id] = data.merge(prev_data)
-	
+
 	return dict
 
 static func create_tileset_resources(source_file: String, tilesets_dict: Dictionary) -> Array:

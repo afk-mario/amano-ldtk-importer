@@ -1,5 +1,6 @@
 @tool
 const Util = preload("../util/util.gd")
+const Level = preload("../util/level.gd")
 
 const Layer = preload("ldtk-layer.gd")
 
@@ -13,19 +14,19 @@ static func create_world_levels(
 ) -> Array:
 	var level_indices = Util.get_level_indicies(world_data, options)
 	var levels := []
-	
-	
+
+
 	for i in level_indices:
 		var level_data = world_data.levels[i]
 		# Group layers defs in to grid size level and add the index information
 		var current_index = 0
 		var layers_data := []
-	
+
 		for j in range(0, level_data.layerInstances.size()):
 			var layer_data :Dictionary = level_data.layerInstances[j]
 			layer_data.index = j
 			layers_data.append(layer_data)
-		
+
 		var layers_dict :Dictionary = layers_data.reduce(
 			func (acc, curr):
 				var grid_size :int=curr.__gridSize
@@ -34,8 +35,8 @@ static func create_world_levels(
 				acc[int(grid_size)][int(curr.layerDefUid)] = curr
 				return acc
 		,{})
-		
-		var level = create_level(source_file, world_data.base_dir, level_data,layers_dict, tilesets_dict, options)
+
+		var level = create_level(source_file, world_data, level_data, layers_dict, tilesets_dict, options)
 		levels.push_back(level)
 
 	return levels
@@ -66,16 +67,16 @@ static func pack_level(level: Node2D) -> PackedScene:
 
 static func create_level(
 	source_file: String,
-	base_dir: String,
+	world_data: Dictionary,
 	level_data: Dictionary,
 	layers_dict: Dictionary,
 	tilesets_dict: Dictionary,
 	options: Dictionary
 ) -> Node2D:
 	var level = Node2D.new()
-
+	var base_dir :String = world_data.base_dir
 	level.name = level_data.identifier
-	level.position = Vector2(level_data.worldX, level_data.worldY)
+	level.position = Level.get_world_position(world_data, level_data)
 
 	if level_data.bgRelPath != null:
 		var bg_data :Dictionary= level_data.__bgPos
@@ -89,9 +90,9 @@ static func create_level(
 			if bg_data.cropRect:
 				sprite.region_enabled = true
 				sprite.region_rect = Rect2(
-					bg_data.cropRect[0], 
-					bg_data.cropRect[1], 
-					bg_data.cropRect[2], 
+					bg_data.cropRect[0],
+					bg_data.cropRect[1],
+					bg_data.cropRect[2],
 					bg_data.cropRect[3]
 				)
 			if bg_data.scale:
@@ -99,9 +100,14 @@ static func create_level(
 			if bg_data.topLeftPx:
 				sprite.offset = Vector2(bg_data.topLeftPx[0], bg_data.topLeftPx[1])
 		level.add_child(sprite)
-	
+
 	var layer_instances = Layer.get_level_layer_instances(
-		source_file, level_data, layers_dict, tilesets_dict, options
+		source_file,
+		world_data,
+		level_data,
+		layers_dict,
+		tilesets_dict,
+		options
 	)
 
 	for layer_instance in layer_instances:

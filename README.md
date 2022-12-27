@@ -26,8 +26,9 @@ LDtk importer for Godot 4
 	- Levels
 	- World
 - [x] Import level background images 
+- [x] Import int layers without tile atlases
+- [x] Support level positioning on "GridVania", "Free", "LinearHorizontal" and "LinearVertical" layouts
 - [ ] Import LDtk Entities
-- [ ] Import int layers without tile atlases
 - [ ] Import CSV from simple LDtk export
 
 ## Limitations

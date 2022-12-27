@@ -45,3 +45,8 @@ static func get_tile_region(tile_id: Vector2i, tileset_data: Dictionary) -> Rect
 	var rect = Rect2(pixel_tile, Vector2(atlas_grid_size, atlas_grid_size))
 
 	return rect
+
+static func get_cell_coords_from_index(index: int, columns: int) -> Vector2i:
+	var x = floor(index % columns)
+	var y = floor(index / columns)
+	return Vector2i(x, y)

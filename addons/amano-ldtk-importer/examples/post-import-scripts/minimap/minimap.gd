@@ -1,7 +1,7 @@
 @tool
 
-const Util = preload("res://addons/ldtk-importer/util/util.gd")
-
+const Util = preload("res://addons/amano-ldtk-importer/util/util.gd")
+const Tile = preload("res://addons/amano-ldtk-importer/util/tile.gd")
 
 static func get_minimap_save_path(source_file: String) -> String:
 	var save_path = Util.get_save_folder_path(source_file) + "/minimaps"
@@ -37,15 +37,14 @@ static func create_level_mini_map(
 
 			for index in layer_data.size():
 				var cell = int(layer_data[index])
-				var x = floor(index % cols)
-				var y = floor(index / cols)
+				var coords := Tile.get_cell_coords_from_index(index, cols)
 
 				if cell != 0 and not ignore_values.has(cell):
 					var color = Color(cell * 100)
 					color.a = 1.0
 					color.r = color.b
 					color.g = color.b
-					img.set_pixel(x, y, color)
+					img.set_pixel(coords.x, coords.y, color)
 
 	var path = save_path + "/" + save_file_name
 	var err = img.save_png(path)

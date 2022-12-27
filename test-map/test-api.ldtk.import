@@ -7,10 +7,10 @@ path="res://.godot/imported/test-api.ldtk-0d5e0e641310acdf0668fb90ad94707e.scn"
 
 [deps]
 
-files=["res://test-map/test-api/tilesets/test-api-tileset-16x16.res"]
+files=["res://test-map/test-api/tilesets/test-api-tileset-16x16.res", "res://test-map/test-api/tilesets/test-api-tileset-8x8.res"]
 
 source_file="res://test-map/test-api.ldtk"
-dest_files=["res://.godot/imported/test-api.ldtk-0d5e0e641310acdf0668fb90ad94707e.scn", "res://test-map/test-api/tilesets/test-api-tileset-16x16.res"]
+dest_files=["res://.godot/imported/test-api.ldtk-0d5e0e641310acdf0668fb90ad94707e.scn", "res://test-map/test-api/tilesets/test-api-tileset-16x16.res", "res://test-map/test-api/tilesets/test-api-tileset-8x8.res"]
 
 [params]
 
