@@ -1,0 +1,29 @@
+[remap]
+
+importer="LDtk_world.import"
+type="PackedScene"
+uid="uid://bs3xg3ibhkbqj"
+path="res://.godot/imported/test-api.ldtk-88b524fb690a8a8569297a2859e7048c.scn"
+
+[deps]
+
+files=["res://maps/test-map/test-api/tilesets/test-api-tileset-16x16.res", "res://maps/test-map/test-api/tilesets/test-api-tileset-8x8.res"]
+
+source_file="res://maps/test-map/test-api.ldtk"
+dest_files=["res://.godot/imported/test-api.ldtk-88b524fb690a8a8569297a2859e7048c.scn", "res://maps/test-map/test-api/tilesets/test-api-tileset-16x16.res", "res://maps/test-map/test-api/tilesets/test-api-tileset-8x8.res"]
+
+[params]
+
+add_metadata=false
+world_post_import_script=""
+Tilesets=""
+import_tileset_custom_data=true
+tileset_post_import_script=""
+Levels=""
+import_all_levels=true
+Levels_To_import="0,1"
+pack_levels=false
+post_import_level_script=""
+Entities=""
+import_entities=true
+post_import_entities_script="res://addons/amano-ldtk-importer/examples/post-import-scripts/post-import-entities-create-nodes.gd"

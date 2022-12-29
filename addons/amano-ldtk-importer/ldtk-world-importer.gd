@@ -8,7 +8,7 @@ const Level = preload("src/ldtk-level.gd")
 const Tileset = preload("src/ldtk-tileset.gd")
 
 
-enum Presets { PRESET_DEFAULT, PRESET_COLLISIONS }
+enum Presets { PRESET_DEFAULT }
 
 func _get_importer_name() -> String:
 	return "LDtk_world.import"
@@ -46,12 +46,15 @@ func _get_preset_name(preset: int) -> String:
 	match preset:
 		Presets.PRESET_DEFAULT:
 			return "Default"
-		Presets.PRESET_COLLISIONS:
-			return "Import Collisions"
 	return ""
 
 func _get_import_options(path: String, preset_index: int) -> Array:
 	return [
+		{
+			"name": "add_metadata",
+			"default_value": false,
+			"hint_string": "If true, will add the original LDtk data as metadata."
+		},
 		{
 			"name": "world_post_import_script",
 			"default_value": "",
@@ -59,6 +62,7 @@ func _get_import_options(path: String, preset_index: int) -> Array:
 			"hint_string": "*.gd;GDScript"
 		},
 		{"name": "Tilesets", "default_value": "", "usage": PROPERTY_USAGE_GROUP},
+
 		{"name": "import_tileset_custom_data", "default_value": true},
 		{
 			"name": "tileset_post_import_script",
@@ -67,12 +71,6 @@ func _get_import_options(path: String, preset_index: int) -> Array:
 			"hint_string": "*.gd;GDScript"
 		},
 		{"name": "Levels", "default_value": "", "usage": PROPERTY_USAGE_GROUP},
-		{
-			"name": "post_import_level_script",
-			"default_value": "",
-			"property_hint": PROPERTY_HINT_FILE,
-			"hint_string": "*.gd;GDScript"
-		},
 		{"name": "import_all_levels", "default_value": true},
 		{
 			"name": "Levels_To_import",
@@ -80,18 +78,25 @@ func _get_import_options(path: String, preset_index: int) -> Array:
 			"hint_string": "usage: 1,3,6 where the numbers represent the level index"
 		},
 		{"name": "pack_levels", "default_value": false},
+		{
+			"name": "post_import_level_script",
+			"default_value": "",
+			"property_hint": PROPERTY_HINT_FILE,
+			"hint_string": "*.gd;GDScript"
+		},
 		{"name": "Entities", "default_value": "", "usage": PROPERTY_USAGE_GROUP},
 		{
-			"name": "import_custom_entities",
+			"name": "import_entities",
 			"default_value": true,
 			"hint_string":
 			"If true, will only use this project's scenes. If false, will import objects as simple scenes."
 		},
-		{
-			"name": "import_metadata",
-			"default_value": true,
-			"hint_string": "If true, will import entity fields as metadata."
-		}
+			{
+			"name": "post_import_entities_script",
+			"default_value": "",
+			"property_hint": PROPERTY_HINT_FILE,
+			"hint_string": "*.gd;GDScript"
+		},
 	]
 
 func _get_option_visibility(path: String, option_name: StringName, options: Dictionary) -> bool:

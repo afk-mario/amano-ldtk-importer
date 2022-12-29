@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://2af3r8mq5oeq"
-path="res://.godot/imported/Inca_back2_by_Kronbits.png-23bcd2e13e19384eb05fdffa66a9e59c.ctex"
+uid="uid://cbdjlyk2xac5l"
+path="res://.godot/imported/Cavernas_by_Adam_Saltsman.png-9014b9a35ce3b49417ae14bb21e9c442.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://test-map/Inca_back2_by_Kronbits.png"
-dest_files=["res://.godot/imported/Inca_back2_by_Kronbits.png-23bcd2e13e19384eb05fdffa66a9e59c.ctex"]
+source_file="res://maps/test-map/Cavernas_by_Adam_Saltsman.png"
+dest_files=["res://.godot/imported/Cavernas_by_Adam_Saltsman.png-9014b9a35ce3b49417ae14bb21e9c442.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://3ye4ujewh7n7"
-path="res://.godot/imported/Inca_front_by_Kronbits-extended.png-a7ba5e63ea69bfad64a055adb68f3865.ctex"
+uid="uid://d3mqtotav4yys"
+path="res://.godot/imported/Inca_back2_by_Kronbits.png-56fbdef5a8cd150f8f0e19ed1c0314a8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://test-map/Inca_front_by_Kronbits-extended.png"
-dest_files=["res://.godot/imported/Inca_front_by_Kronbits-extended.png-a7ba5e63ea69bfad64a055adb68f3865.ctex"]
+source_file="res://maps/test-map/Inca_back2_by_Kronbits.png"
+dest_files=["res://.godot/imported/Inca_back2_by_Kronbits.png-56fbdef5a8cd150f8f0e19ed1c0314a8.ctex"]
 
 [params]
 

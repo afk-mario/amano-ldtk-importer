@@ -1,10 +1,10 @@
 @tool
 const CHILDREN_META = "children"
 
-const Entity = preload("ldtk-entity.gd")
 const Tileset = preload("ldtk-tileset.gd")
 
 const Tile = preload("../util/tile.gd")
+const Entity = preload("../util/entity.gd")
 
 static func get_level_layer_instances(
 	source_file: String,
@@ -33,9 +33,10 @@ static func get_level_layer_instances(
 				"tileset": layer_data.get("__tilesetDefUid", null) != null
 			}
 			match match_data:
-				{"type": "Entities", "tileset": true}, \
-				{"type": "Entities", "tileset": false}:
-					pass
+				{"type": "Entities", ..}:
+					if options.import_entities:
+						var layer = create_entity_layer(source_file, world_data, layer_data, options)
+						layers.push_front(layer)
 				{"type": "IntGrid", "tileset": false}:
 					var layer_created := create_int_layer(
 						tilemap, tile_layer_index, layer_data, world_data, options
@@ -149,26 +150,50 @@ static func create_tile_layer(
 
 	return true
 
-static func create_entity_layer(data: Dictionary, options: Dictionary) -> Node2D:
+static func create_entity_layer(source_file: String, world_data: Dictionary, layer_data: Dictionary, options: Dictionary) -> Node2D:
 	var layer = null
 	layer = Node2D.new()
 
-	layer.name = data.__identifier
+	layer.name = layer_data.__identifier
+	var entity_instances :Array = layer_data.entityInstances
 
-	var entities = Entity.get_layer_entities(data, options)
+	var entities_data :Array = entity_instances.map(
+		func(entity):
+			var data :Dictionary = {
+				"iid": entity.iid,
+				"def_uid": entity.defUid,
+				"identifier": entity.__identifier,
+				"smart_color": Color.from_string(entity.__smartColor, Color.WHITE),
+				"width": entity.width,
+				"height": entity.height,
+				"grid": Vector2i(entity.__grid[0], entity.__grid[1]),
+				"px": Vector2i(entity.px[0], entity.px[1]),
+				"pivot": Vector2(entity.__pivot[0], entity.__pivot[1]),
+				"tags": entity.__tags,
+				"fields": Entity.get_field_instances_as_dict(entity.fieldInstances)
+			}
+			return data
+	)
 
-	for key in entities.keys():
-		var entity = entities[key]
-		if entity.has_meta(CHILDREN_META):
-			for ref in entity.get_meta(CHILDREN_META):
-				var child = entities[ref.entityIid]
-				child.position -= entity.position
-				entity.add_child(child)
+	layer.set_meta("entity_instances", entities_data)
 
-	for key in entities.keys():
-		var entity = entities[key]
-		var oldParent = entity.get_parent()
-		if !oldParent:
-			layer.add_child(entity)
+	var post_import_script = options.post_import_entities_script
+
+	if not post_import_script.is_empty():
+		var script = load(post_import_script)
+		if not script or not script is GDScript:
+			printerr("Entities post import script is not a GDScript.")
+			return null
+
+		script = script.new()
+		if not script.has_method("post_import"):
+			printerr("Entities post import script does not have a 'post_import' method.")
+			return null
+
+		layer = script.post_import(layer, source_file, world_data, layer_data)
+
+		if not layer or not layer is Node2D:
+			printerr("Invalid scene returned from post import script.")
+			return null
 
 	return layer

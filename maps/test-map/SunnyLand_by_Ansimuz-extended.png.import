@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cpwev5oep636k"
-path="res://.godot/imported/SunnyLand_by_Ansimuz-extended.png-404dfdcf71ea0c139bc31caa8e398568.ctex"
+uid="uid://bciwbeymn4485"
+path="res://.godot/imported/SunnyLand_by_Ansimuz-extended.png-f3a86425e6c9331e3892b2a045b88189.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://test-map/SunnyLand_by_Ansimuz-extended.png"
-dest_files=["res://.godot/imported/SunnyLand_by_Ansimuz-extended.png-404dfdcf71ea0c139bc31caa8e398568.ctex"]
+source_file="res://maps/test-map/SunnyLand_by_Ansimuz-extended.png"
+dest_files=["res://.godot/imported/SunnyLand_by_Ansimuz-extended.png-f3a86425e6c9331e3892b2a045b88189.ctex"]
 
 [params]
 

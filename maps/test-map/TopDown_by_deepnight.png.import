@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://g24t1wwdrdny"
-path="res://.godot/imported/Beach by deepnight.png-d934422470c4e27595d9ed851e14d45d.ctex"
+uid="uid://d0x8ymwgjfs1a"
+path="res://.godot/imported/TopDown_by_deepnight.png-0386bae30a857dc1984b7c4f70228735.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://test-map/Beach by deepnight.png"
-dest_files=["res://.godot/imported/Beach by deepnight.png-d934422470c4e27595d9ed851e14d45d.ctex"]
+source_file="res://maps/test-map/TopDown_by_deepnight.png"
+dest_files=["res://.godot/imported/TopDown_by_deepnight.png-0386bae30a857dc1984b7c4f70228735.ctex"]
 
 [params]
 

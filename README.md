@@ -25,10 +25,10 @@ LDtk importer for Godot 4
 	- Tilesets
 	- Levels
 	- World
-- [x] Import level background images 
+- [x] Import level background images
 - [x] Import int layers without tile atlases
 - [x] Support level positioning on "GridVania", "Free", "LinearHorizontal" and "LinearVertical" layouts
-- [ ] Import LDtk Entities
+- [x] Import LDtk Entities
 - [ ] Import CSV from simple LDtk export
 
 ## Limitations
@@ -49,12 +49,12 @@ extends Node
 
 func post_import(tileset: TileSet) -> TileSet:
 	var grid_size :Vector2i = tileset_source.get_atlas_grid_size()
-	
+
 	for y in range(0, grid_size.y):
 		for x in range(0, grid_size.x):
 			# modify the tile at position [x,y]
 			...
-		
+
 	return tileset
 
 ```
