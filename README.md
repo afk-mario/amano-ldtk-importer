@@ -2,13 +2,19 @@
 
 LDtk importer for Godot 4
 
-
-**Note: This plugin is incomplete, it's public in hopes that it will be helpful for someone migrating their project to Godot 4**
-
 ---
 
+![](https://img.shields.io/badge/Godot%20Compatible-4.0%2B-%234385B5)
 
-## Features
+> ⚠ **Disclaimer: Godot 4 is not released yet. As a result the plugin may be unstable to use, and the API may change.**
+
+# Installation
+
+1. [Download]()
+2. Unpack the `amano-ldtkk-importer` folder into your `/addons` folder within the Godot project
+3. Enable this addon within the Godot settings: `Project > Project Settings > Plugins`
+
+# Features
 
 - [x] Import LDtk Tilesets as Godot Tilesets
 	- [x] Generate Godot TileSetAtlasSources from LDtk Tilesets
@@ -31,31 +37,43 @@ LDtk importer for Godot 4
 - [x] Import LDtk Entities
 - [ ] Import CSV from simple LDtk export
 
-## Limitations
+# Limitations
 
 - [Godot4 doesn't support flipped tiles](https://github.com/godotengine/godot-proposals/issues/3967)
 - [Can't support LDtk external level files with the current LDtk implementation](https://github.com/deepnight/ldtk/issues/734)
 - LDtk support for multiple tiles in a single layer using auto tile rules, this plugin will not support that.
 
-## Metadata
+# Metadata
 
 Metada information will be set on the World root node, the level root node, the tileset resource and the entities root node, from the import options you can choose to skip all the raw metadata and source file entries. This information can be used in the post-script scripts or at runtime.
 
-### World Metadata
+## World Metadata
 
 In the world root node two metadata keys are added:
 
 - `LDtk_raw_data` The full LDTK parsed JSON as a dictionary
 - `LDtk_source_file` the imported LDtk file path
 
-### Tilesets Metadata
+## Tilesets Metadata
 
 In the tileset resources there are two keys added:
 
 - `LDtk_raw_data` The tileset definition parsed JSON as a dictionary, the importer will generate a new tileset and tileset source for IntGrid layers, this don't have the metadata key.
 - `LDtk_source_file` the imported LDtk file path
 
-### Level Metadata
+## Tile Metadata
+
+Every tileset will have a custom data layer named `LDtk_tile_data` with the following structure:
+```gdscript
+{
+	enums: [], # Array of all enums as strings each tile has,
+	... # All the other fields each tile has in the LDtk custom data 
+}
+```
+
+Also the importer will create a `TilesetSource` per IntGrid Layer and append a custom data layer to the `Tileset` with the name of the IntGrid layer from LDtk 
+
+## Level Metadata
 
 In the root level node there are three keys added:
 - `LDtk_level_fields` The level `fieldInstances` parsed and converted to Godot Types.
@@ -63,7 +81,7 @@ In the root level node there are three keys added:
 - `LDtk_raw_reds` The world refs parsed JSON as a dictionary
 - `LDtk_source_file` the imported LDtk file path
 
-### Entity Metadata
+## Entity Metadata
 
 In Node created for each entity layer there are two keys added.
 - `LDtk_entity_instances` the parsed entity data for each layer in the following format:
@@ -86,11 +104,11 @@ In Node created for each entity layer there are two keys added.
 - `LDtk_source_file` the imported LDtk file path
 
 
-## Post Import Scripts
+# Post Import Scripts
 
 You can modify the resulting scene by hooking up to the post import scripts in the import options, an example of the structure of the scripts is as follows:
 
-### Post Import tileset
+## Post Import tileset
 
 ```gdscript
 @tool
@@ -108,7 +126,7 @@ func post_import(tileset: TileSet) -> TileSet:
 
 ```
 
-### Post Import Level
+## Post Import Level
 
 ```gdscript
 @tool
@@ -121,7 +139,7 @@ func post_import(level: Node2D) -> Node2D:
 
 ```
 
-### Post import World
+## Post import World
 
 ```gdscript
 @tool
@@ -137,11 +155,11 @@ func post_import(world: Node2D) -> Node2D:
 for more examples check the [examples](https://github.com/afk-mario/amano-ldtk-importer/tree/main/addons/amano-ldtk-importer/examples/post-import-scripts) directory.
 
 
-## Collisions
+# Collisions
 
-LDtk doesn't have a UI to create collision polygons on each tile like Tiled or the Godot tile map UI. It does support custom data on the tiles, so you can use that to generate the physics layers and collision polygons using a post script. There is a [basic example](https://github.com/afk-mario/amano-ldtk-importer/blob/main/addons/amano-ldtk-importer/examples/post-import-scripts/post-import-tileset-add-collisions.gd) in the example folders.
+LDtk doesn't have a UI to create collision polygons on each tile like Tiled or the Godot tile map UI. It does support custom data on the tiles, so you can use that metadata to generate the physics layers and collision polygons using a post script. There is a [basic example](https://github.com/afk-mario/amano-ldtk-importer/blob/main/addons/amano-ldtk-importer/examples/post-import-scripts/post-import-tileset-add-collisions.gd) using enums or using [IntGrid]() layers in the example folders.
 
-## Notes
+# Notes
 
 Started as a fork from https://github.com/levigilbert/godot-LDtk-import
 
