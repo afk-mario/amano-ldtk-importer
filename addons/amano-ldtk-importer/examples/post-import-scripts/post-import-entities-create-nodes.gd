@@ -3,14 +3,9 @@ extends Node
 
 var entity_ref_test := preload("res://scenes/entity-ref-test.tscn")
 
-func post_import(
-	entity_layer: Node2D,
-	source_file: String,
-	world_data: Dictionary,
-	layer_data: Dictionary,
-) -> Node2D:
-	var data :Array = entity_layer.get_meta("entity_instances")
-	var entities_defs :Array = world_data.defs.entities
+func post_import(entity_layer: Node2D) -> Node2D:
+	var data :Array = entity_layer.get_meta("LDtk_entity_instances")
+	var entities_defs :Array = entity_layer.get_meta("LDtk_raw_defs").entities
 	var entities_defs_uid := entities_defs.map(func(item): return int(item.uid))
 	var label_settings := LabelSettings.new()
 	label_settings.font_size = 8

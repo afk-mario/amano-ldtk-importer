@@ -4,7 +4,8 @@ const CHILDREN_META = "children"
 const Tileset = preload("ldtk-tileset.gd")
 
 const Tile = preload("../util/tile.gd")
-const Entity = preload("../util/entity.gd")
+const Field = preload("../util/field.gd")
+const PostImport = preload("../util/post-import.gd")
 
 static func get_level_layer_instances(
 	source_file: String,
@@ -170,30 +171,23 @@ static func create_entity_layer(source_file: String, world_data: Dictionary, lay
 				"px": Vector2i(entity.px[0], entity.px[1]),
 				"pivot": Vector2(entity.__pivot[0], entity.__pivot[1]),
 				"tags": entity.__tags,
-				"fields": Entity.get_field_instances_as_dict(entity.fieldInstances)
+				"fields": Field.get_field_instances_as_dict(entity.fieldInstances)
 			}
 			return data
 	)
 
-	layer.set_meta("entity_instances", entities_data)
+	layer.set_meta("LDtk_entity_instances", entities_data)
 
-	var post_import_script = options.post_import_entities_script
+	if options.entity_add_metadata:
+		layer.set_meta("LDtk_raw_data", entity_instances)
+		layer.set_meta("LDtk_raw_defs", world_data.defs)
+		layer.set_meta("LDtk_source_file", source_file)
 
-	if not post_import_script.is_empty():
-		var script = load(post_import_script)
-		if not script or not script is GDScript:
-			printerr("Entities post import script is not a GDScript.")
-			return null
-
-		script = script.new()
-		if not script.has_method("post_import"):
-			printerr("Entities post import script does not have a 'post_import' method.")
-			return null
-
-		layer = script.post_import(layer, source_file, world_data, layer_data)
-
-		if not layer or not layer is Node2D:
-			printerr("Invalid scene returned from post import script.")
-			return null
+	layer = PostImport.run_post_import(
+		layer,
+		options.entity_post_import_script,
+		source_file,
+		"Layer"
+	)
 
 	return layer

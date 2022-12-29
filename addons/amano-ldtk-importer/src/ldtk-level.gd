@@ -1,9 +1,10 @@
 @tool
 const Util = preload("../util/util.gd")
 const Level = preload("../util/level.gd")
+const Field = preload("../util/field.gd")
+const PostImport = preload("../util/post-import.gd")
 
 const Layer = preload("ldtk-layer.gd")
-
 
 static func get_level_save_path(source_file: String) -> String:
 	var save_path = Util.get_save_folder_path(source_file) + "/levels"
@@ -74,9 +75,17 @@ static func create_level(
 	options: Dictionary
 ) -> Node2D:
 	var level = Node2D.new()
-	var base_dir :String = world_data.base_dir
+	var base_dir :String = source_file.get_base_dir()
 	level.name = level_data.identifier
 	level.position = Level.get_world_position(world_data, level_data)
+
+	var fields = Field.get_field_instances_as_dict(level_data.fieldInstances)
+	level.set_meta("LDtk_level_fields", fields)
+
+	if options.level_add_metadata:
+		level.set_meta("LDtk_raw_data", level_data)
+		level.set_meta("LDtk_raw_defs", world_data.defs)
+		level.set_meta("LDtk_source_file", source_file)
 
 	if level_data.bgRelPath != null:
 		var bg_data :Dictionary= level_data.__bgPos
@@ -113,21 +122,11 @@ static func create_level(
 	for layer_instance in layer_instances:
 		level.add_child(layer_instance)
 
-	if not options.post_import_level_script.is_empty():
-		var script = load(options.post_import_level_script)
-		if not script or not script is GDScript:
-			printerr("Post import script is not a GDScript.")
-			return null
-
-		script = script.new()
-		if not script.has_method("post_import"):
-			printerr("Post import script does not have a 'post_import' method.")
-			return null
-
-		level = script.post_import(level, level_data, source_file)
-
-		if not level or not level is Node2D:
-			printerr("Invalid scene returned from post import script.")
-			return null
+	level = PostImport.run_post_import(
+		level,
+		options.level_post_import_script,
+		source_file,
+		"Level"
+	)
 
 	return level

@@ -2,10 +2,11 @@
 
 const Tile = preload("../util/tile.gd")
 const Util = preload("../util/util.gd")
+const PostImport = preload("../util/post-import.gd")
 
 # Only create one custom data layer per tileset with the name LDtk
 const CUSTOM_DATA_LAYER_INDEX := 0
-const CUSTOM_DATA_LAYER_NAME := 'LDtk'
+const CUSTOM_DATA_LAYER_NAME := 'LDtk_tile_data'
 
 static func get_tileset_save_path(source_file: String) -> String:
 	var save_path = Util.get_save_folder_path(source_file) + "/tilesets"
@@ -13,9 +14,10 @@ static func get_tileset_save_path(source_file: String) -> String:
 
 
 static func get_tilesets_dict(source_file: String, world_data: Dictionary, options: Dictionary) -> Dictionary:
-	var base_dir :String = world_data.base_dir
+	var base_dir :String = source_file.get_base_dir()
 	var tilesets_data: Array = world_data.defs.tilesets
 	var layers_data: Array = world_data.defs.layers
+
 	var dict :Dictionary = tilesets_data.reduce(
 		func(acc: Dictionary, curr: Dictionary):
 			var tile_grid_size :int= curr.tileGridSize
@@ -23,6 +25,9 @@ static func get_tilesets_dict(source_file: String, world_data: Dictionary, optio
 				acc[tile_grid_size] = create_tileset(
 					source_file, tile_grid_size, options
 				)
+				if options.tileset_add_metadata:
+					acc[tile_grid_size].set_meta("LDtk_raw_data", curr)
+
 			create_tileset_source(acc[tile_grid_size], base_dir, curr, options)
 			return acc
 	,{}
@@ -35,23 +40,19 @@ static func get_tilesets_dict(source_file: String, world_data: Dictionary, optio
 				dict[tile_grid_size] = create_tileset(
 					source_file, tile_grid_size, options
 				)
+
 			var tile_set :TileSet = dict[tile_grid_size]
 			create_tileset_int_source(tile_set, layer_data)
 
 
-	if not options.tileset_post_import_script.is_empty():
-		var script = load(options.tileset_post_import_script)
-		if not script or not script is GDScript:
-			printerr("Tileset post import script is not a GDScript.")
-			dict
 
-		script = script.new()
-		if not script.has_method("post_import"):
-			printerr("Tileset post import script does not have a 'post_import' method.")
-			return dict
-
-		for key in dict:
-			dict[key] = script.post_import(dict[key])
+	for key in dict:
+		dict[key] = PostImport.run_post_import(
+			dict[key],
+			options.tileset_post_import_script,
+			source_file,
+			"Tileset"
+		)
 
 	return dict
 
@@ -63,6 +64,9 @@ static func create_tileset(source_file: String, tile_grid_size: int, options: Di
 	tileset.add_custom_data_layer()
 	tileset.set_custom_data_layer_name(CUSTOM_DATA_LAYER_INDEX, CUSTOM_DATA_LAYER_NAME)
 	tileset.set_custom_data_layer_type(CUSTOM_DATA_LAYER_INDEX, TYPE_DICTIONARY)
+
+	if options.tileset_add_metadata:
+		tileset.set_meta("LDtk_source_file", source_file)
 
 	return tileset
 
@@ -157,8 +161,13 @@ static func get_tiles_data(tileset_data: Dictionary) -> Dictionary:
 		var tiles_ids :Array= tag.tileIds
 
 		for tile_id in tiles_ids:
-			dict[int(tile_id)] = {
-				"enum": value
+			tile_id = int(tile_id)
+			if not dict.has(tile_id):
+				dict[tile_id] = {}
+			var enums :Array = dict[tile_id].get("enums", [])
+			enums.push_front(value)
+			dict[tile_id] = {
+				"enums": enums
 			}
 
 	for tile_data in tileset_data.customData:

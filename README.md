@@ -34,8 +34,57 @@ LDtk importer for Godot 4
 ## Limitations
 
 - [Godot4 doesn't support flipped tiles](https://github.com/godotengine/godot-proposals/issues/3967)
-- [Can't support LDtk external with the current LDtk implementation](https://github.com/deepnight/ldtk/issues/734)
+- [Can't support LDtk external level files with the current LDtk implementation](https://github.com/deepnight/ldtk/issues/734)
 - LDtk support for multiple tiles in a single layer using auto tile rules, this plugin will not support that.
+
+## Metadata
+
+Metada information will be set on the World root node, the level root node, the tileset resource and the entities root node, from the import options you can choose to skip all the raw metadata and source file entries. This information can be used in the post-script scripts or at runtime.
+
+### World Metadata
+
+In the world root node two metadata keys are added:
+
+- `LDtk_raw_data` The full LDTK parsed JSON as a dictionary
+- `LDtk_source_file` the imported LDtk file path
+
+### Tilesets Metadata
+
+In the tileset resources there are two keys added:
+
+- `LDtk_raw_data` The tileset definition parsed JSON as a dictionary, the importer will generate a new tileset and tileset source for IntGrid layers, this don't have the metadata key.
+- `LDtk_source_file` the imported LDtk file path
+
+### Level Metadata
+
+In the root level node there are three keys added:
+- `LDtk_level_fields` The level `fieldInstances` parsed and converted to Godot Types.
+- `LDtk_raw_data` The level instance LDtk parsed JSON as a dictionary
+- `LDtk_raw_reds` The world refs parsed JSON as a dictionary
+- `LDtk_source_file` the imported LDtk file path
+
+### Entity Metadata
+
+In Node created for each entity layer there are two keys added.
+- `LDtk_entity_instances` the parsed entity data for each layer in the following format:
+	```gdscript
+	{
+		"iid": ...,
+		"def_uid": ...,
+		"identifier": ...,
+		"smart_color": ...,
+		"width": ...,
+		"height": ...,
+		"grid": ...,
+		"px": ...,
+		"pivot": ...,
+		"tags": ...,
+		"fields": ..., # The fieldInstances from LDtk parsed and converted to Godot Types.
+	}
+	```
+- `LDtk_raw_data` The raw `entityInstances` parsed JSON data as a dictionary
+- `LDtk_source_file` the imported LDtk file path
+
 
 ## Post Import Scripts
 
@@ -65,7 +114,7 @@ func post_import(tileset: TileSet) -> TileSet:
 @tool
 extends Node
 
-func post_import(level: Node2D, _level_data: Dictionary, _source_file: String) -> Node2D:
+func post_import(level: Node2D) -> Node2D:
 	# modify level
 	...
 	return level

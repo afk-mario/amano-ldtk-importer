@@ -29,11 +29,11 @@ static func get_save_folder_path(source_file: String) -> String:
 
 
 # Get LDtk file as JSON.
-static func parse_ldtk_file(filepath: String) -> Dictionary:
-	var json_file = FileAccess.open(filepath, FileAccess.READ)
+static func parse_ldtk_file(source_file: String) -> Dictionary:
+	var json_file = FileAccess.open(source_file, FileAccess.READ)
 	var data = JSON.parse_string(json_file.get_as_text())
 	json_file = null
-	data["base_dir"] = filepath.get_base_dir()
+#	data["base_dir"] = source_file.get_base_dir()
 
 	return data
 
@@ -55,6 +55,6 @@ static func get_level_indicies(world_data: Dictionary, options: Dictionary) -> A
 		for i in world_data.levels.size():
 			level_indices.append(i)
 	else:
-		level_indices = options.Levels_To_import.split_floats(",", false)
+		level_indices = options.levels_to_import.split_floats(",", false)
 
 	return level_indices
