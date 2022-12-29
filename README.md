@@ -11,7 +11,7 @@ LDtk importer for Godot 4
 # Installation
 
 1. [Download]()
-2. Unpack the `amano-ldtkk-importer` folder into your `/addons` folder within the Godot project
+2. Unpack the `amano-ldtk-importer` folder into your `/addons` folder within the Godot project
 3. Enable this addon within the Godot settings: `Project > Project Settings > Plugins`
 
 # Features
