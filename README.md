@@ -10,7 +10,7 @@ LDtk importer for Godot 4
 
 # Installation
 
-1. [Download]()
+1. [Download](https://github.com/afk-mario/amano-ldtk-importer/archive/refs/heads/main.zip)
 2. Unpack the `amano-ldtk-importer` folder into your `/addons` folder within the Godot project
 3. Enable this addon within the Godot settings: `Project > Project Settings > Plugins`
 
@@ -157,7 +157,7 @@ for more examples check the [examples](https://github.com/afk-mario/amano-ldtk-i
 
 # Collisions
 
-LDtk doesn't have a UI to create collision polygons on each tile like Tiled or the Godot tile map UI. It does support custom data on the tiles, so you can use that metadata to generate the physics layers and collision polygons using a post script. There is a [basic example](https://github.com/afk-mario/amano-ldtk-importer/blob/main/addons/amano-ldtk-importer/examples/post-import-scripts/post-import-tileset-add-collisions.gd) using enums or using [IntGrid]() layers in the example folders.
+LDtk doesn't have a UI to create collision polygons on each tile like Tiled or the Godot tile map UI. It does support custom data on the tiles, so you can use that metadata to generate the physics layers and collision polygons using a post script. There is a [basic example](https://github.com/afk-mario/amano-ldtk-importer/blob/main/addons/amano-ldtk-importer/examples/post-import-scripts/post-import-tileset-add-collisions-by-enum.gd) using enums or using [IntGrid](https://github.com/afk-mario/amano-ldtk-importer/blob/main/addons/amano-ldtk-importer/examples/post-import-scripts/post-import-tileset-add-collisions-by-int-grid.gd) layers in the example folders.
 
 # Notes
 
