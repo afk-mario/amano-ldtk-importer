@@ -151,7 +151,7 @@ func post_import(level: Node2D) -> Node2D:
 
 ## Post import Entities
 
-```
+```gdscript
 @tool
 extends Node
 
