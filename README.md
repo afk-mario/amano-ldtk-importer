@@ -108,6 +108,18 @@ In Node created for each entity layer there are two keys added.
 
 You can modify the resulting scene by hooking up to the post import scripts in the import options, an example of the structure of the scripts is as follows:
 
+## Post import World
+
+```gdscript
+@tool
+extends Node
+
+func post_import(world: Node2D) -> Node2D:
+	... # modify world
+
+	return world
+```
+
 ## Post Import tileset
 
 ```gdscript
@@ -119,8 +131,7 @@ func post_import(tileset: TileSet) -> TileSet:
 
 	for y in range(0, grid_size.y):
 		for x in range(0, grid_size.x):
-			# modify the tile at position [x,y]
-			...
+			... # modify the tile at position [x,y]
 
 	return tileset
 
@@ -133,26 +144,28 @@ func post_import(tileset: TileSet) -> TileSet:
 extends Node
 
 func post_import(level: Node2D) -> Node2D:
-	# modify level
-	...
-	return level
+	... # modify level
 
+	return level
 ```
 
-## Post import World
+## Post import Entities
 
-```gdscript
+```
 @tool
 extends Node
 
-func post_import(world: Node2D) -> Node2D:
-	# modify world
-	...
-	return world
+var entity_ref_test := preload("res://scenes/entity-ref-test.tscn")
+
+func post_import(entity_layer: Node2D) -> Node2D:
+	var data :Array = entity_layer.get_meta("LDtk_entity_instances")
+	for entity_instance in data:
+		... # do something with each entity instance data.
+
+	return entity_layer
 ```
 
-
-for more examples check the [examples](https://github.com/afk-mario/amano-ldtk-importer/tree/main/addons/amano-ldtk-importer/examples/post-import-scripts) directory.
+For more examples check the [examples](https://github.com/afk-mario/amano-ldtk-importer/tree/main/addons/amano-ldtk-importer/examples/post-import-scripts) directory.
 
 
 # Collisions
