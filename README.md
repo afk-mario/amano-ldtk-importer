@@ -8,6 +8,8 @@ LDtk importer for Godot 4
 
 > ⚠ **Disclaimer: Godot 4 is not released yet. As a result the plugin may be unstable to use, and the API may change.**
 
+![screenshot](assets/screenshot-01.png)
+
 # Installation
 
 1. [Download](https://github.com/afk-mario/amano-ldtk-importer/archive/refs/heads/main.zip)
