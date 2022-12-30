@@ -120,7 +120,7 @@ func post_import(world: Node2D) -> Node2D:
 	return world
 ```
 
-## Post Import tileset
+## Post Import Tileset
 
 ```gdscript
 @tool
