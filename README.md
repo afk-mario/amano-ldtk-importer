@@ -181,3 +181,7 @@ LDtk doesn't have a UI to create collision polygons on each tile like Tiled or t
 Started as a fork from https://github.com/levigilbert/godot-LDtk-import
 
 Used internally by https://amano.games/
+
+# Credits
+
+- Logo design by [@eljovenpaul](https://twitter.com/eljovenpaul)
