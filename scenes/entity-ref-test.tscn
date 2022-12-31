@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://ba3cqyowmknpn"]
 
 [ext_resource type="Script" path="res://scenes/entity-ref-test.gd" id="1_pdicu"]
-[ext_resource type="Texture2D" uid="uid://cyc26xwoq1pvo" path="res://icon.svg" id="2_xkwei"]
+[ext_resource type="Texture2D" uid="uid://e2fq5kq8jswh" path="res://icon.svg" id="2_duqqy"]
 
 [node name="entity-ref-test" type="Node2D"]
 script = ExtResource("1_pdicu")
@@ -9,5 +9,5 @@ target_path = NodePath("")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(4.76837e-07, -2.38419e-07)
-scale = Vector2(0.1, 0.1)
-texture = ExtResource("2_xkwei")
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("2_duqqy")

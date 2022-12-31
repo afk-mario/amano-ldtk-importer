@@ -1,4 +1,5 @@
-# Amano LDtk Importer
+![logo](icon.svg#gh-dark-mode-only)
+![logo](icon-light-mode.svg#gh-light-mode-only)
 
 LDtk importer for Godot 4
 
