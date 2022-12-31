@@ -1,11 +1,12 @@
-![logo](icon.svg#gh-dark-mode-only)
-![logo](icon-light-mode.svg#gh-light-mode-only)
-
-LDtk importer for Godot 4
+<p align="center">
+	<img src="icon.svg#gh-dark-mode-only" alt="Amano LDtk importer logo"/>
+	<img src="icon-light-mode.svg#gh-light-mode-only" alt="Amano LDtk importer logo"/>
+</p>
 
 ---
-
 ![](https://img.shields.io/badge/Godot%20Compatible-4.0%2B-%234385B5)
+
+[LDtk](https://ldtk.io/) importer for [Godot 4](https://godotengine.org/)
 
 > ⚠ **Disclaimer: Godot 4 is not released yet. As a result the plugin may be unstable to use, and the API may change.**
 
