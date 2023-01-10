@@ -174,7 +174,8 @@ static func get_tiles_data(tileset_data: Dictionary) -> Dictionary:
 		var tile_id :int= tile_data.tileId
 		var data :Dictionary= JSON.parse_string(tile_data.data)
 		var prev_data :Dictionary = dict.get(tile_id, {})
-		dict[tile_id] = data.merge(prev_data)
+		data.merge(prev_data)
+		dict[tile_id] = data
 
 	return dict
 
