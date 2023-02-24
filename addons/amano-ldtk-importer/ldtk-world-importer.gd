@@ -122,7 +122,7 @@ func _get_option_visibility(path: String, option_name: StringName, options: Dict
 	return true
 
 
-func _import(source_file: String, save_path: String, options: Dictionary, platform_variants: Array, gen_files: Array) -> int:
+func _import(source_file: String, save_path: String, options: Dictionary, platform_variants: Array, gen_files: Array) -> Error:
 	var world_data := Util.parse_ldtk_file(source_file)
 	var has_external_levels: bool = world_data.externalLevels
 	var tilesets_dict := Tileset.get_tilesets_dict(
