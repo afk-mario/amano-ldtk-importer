@@ -8,7 +8,7 @@
 
 [LDtk](https://ldtk.io/) importer for [Godot 4](https://godotengine.org/)
 
-> ⚠ **We are currently working on [a game for PlayDate](https://amano.games/devlog/lets-finish-this) and our project that uses LDtk with Godot is currently on Godot 3.x. So when we resume work on that project and if Godot 4 is ready for us to port the game we will continue to work on this plugin, meanwhile I hope it helps someone to build upon. **
+> ⚠ **We are currently working on [a game for PlayDate](https://amano.games/devlog/lets-finish-this) and our project that uses LDtk with Godot is currently on Godot 3.x. So when we resume work on that project and if Godot 4 is ready for us to port the game we will continue to work on this plugin, meanwhile I hope it helps someone to build upon.**
 
 # Installation
 
