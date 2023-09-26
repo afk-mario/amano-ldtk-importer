@@ -8,7 +8,7 @@
 
 [LDtk](https://ldtk.io/) importer for [Godot 4](https://godotengine.org/)
 
-> ⚠ **Disclaimer: Godot 4 is not released yet. As a result the plugin may be unstable to use, and the API may change.**
+> ⚠ **We are currently working on [a game for PlayDate](https://amano.games/devlog/lets-finish-this) and our project that uses LDtk with Godot is currently on Godot 3.x. So when we resume work on that project and if Godot 4 is ready for us to port the game we will continue to work on this plugin, meanwhile I hope it helps someone to build upon. **
 
 # Installation
 
@@ -179,6 +179,7 @@ LDtk doesn't have a UI to create collision polygons on each tile like Tiled or t
 # Notes
 
 Started as a fork from https://github.com/levigilbert/godot-LDtk-import
+Another LDtk importer for Godot 4 https://github.com/heygleeson/godot-ldtk-importer
 
 Used internally by https://amano.games/
 
