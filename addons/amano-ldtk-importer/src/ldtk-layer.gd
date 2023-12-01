@@ -147,7 +147,10 @@ static func create_tile_layer(
 			Vector2i(tileset_source.texture_region_size),
 			Vector2i.ZERO
 		)
-		tilemap.set_cell(layer_index, cell_grid_coords, tileset_source_id, tile_grid_coords)
+		var flipx = int(tile.f) & 1
+		var flipy = int(tile.f) & 2
+		var flip_bits = (TileSetAtlasSource.TRANSFORM_FLIP_H if flipx != 0 else 0) | (TileSetAtlasSource.TRANSFORM_FLIP_V if flipy != 0 else 0)
+		tilemap.set_cell(layer_index, cell_grid_coords, tileset_source_id, tile_grid_coords, flip_bits)
 
 	return true
 
